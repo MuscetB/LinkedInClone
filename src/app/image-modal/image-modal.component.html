@@ -1,0 +1,19 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ isProfileImage ? 'Profile Image' : 'Background Image' }}</h5>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body text-center">
+  <img [src]="previewUrl || imageUrl" class="img-fluid mb-3" alt="Image Preview">
+  <div>
+    <input type="file" (change)="onFileSelected($event)">
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger" (click)="deleteImage()">Delete</button>
+  <button type="button" class="btn btn-primary" (click)="uploadImage()">Upload</button>
+  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">Cancel</button>
+</div>

@@ -1,0 +1,226 @@
+<div class="profile-container">
+  <div class="profile-background">
+    <img
+      [src]="
+        profileForm.get('backgroundImageUrl')?.value ||
+        'assets/images/background.png'
+      "
+      alt="Background Image"
+      class="background-img"
+      (click)="openBackgroundImageModal()"
+    />
+    <div class="profile-image" (click)="openProfileImageModal()">
+      <img
+        [src]="
+          profileForm.get('profileImageUrl')?.value ||
+          'assets/images/add-photo.png'
+        "
+        alt="Profile Image"
+        class="profile-img"
+        [ngClass]="{
+          'add-photo-img': !profileForm.get('profileImageUrl')?.value
+        }"
+      />
+      <input
+        type="file"
+        (change)="onProfileImageChange($event)"
+        class="file-input"
+        *ngIf="editMode"
+      />
+    </div>
+    <input
+      type="file"
+      (change)="onBackgroundImageChange($event)"
+      class="file-input"
+      *ngIf="editMode"
+    />
+  </div>
+
+  <div class="profile-info container mt-4">
+    <!-- Profilne informacije -->
+    <div class="row">
+      <div class="col-md-9">
+        <h3>{{ userData?.firstName }} {{ userData?.lastName }}</h3>
+        <p>{{ userData?.education }}</p>
+        <p>
+          {{ userData?.skills }} - <a href="#">{{ userData?.address }}</a>
+        </p>
+        <p>{{ userData?.resume }} connections</p>
+        <button
+          class="btn btn-primary me-2"
+          *ngIf="!editMode"
+          (click)="startChat()"
+        >
+          Send Message
+        </button>
+        <button
+          class="btn btn-secondary me-2"
+          (click)="toggleEditMode()"
+          *ngIf="!editMode"
+        >
+          Edit Profile
+        </button>
+        <button class="btn btn-secondary" *ngIf="editMode" (click)="onSubmit()">
+          Save
+        </button>
+        <button
+          class="btn btn-secondary"
+          *ngIf="editMode"
+          (click)="toggleEditMode()"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- Novi delovi -->
+    <div class="row mt-4">
+      <!-- About div -->
+      <div class="col-md-12">
+        <h4>About</h4>
+        <p>{{ userData?.bio }}</p>
+      </div>
+
+      <!-- Activity div -->
+      <div class="col-md-12 mt-4">
+        <h4>Activity</h4>
+        <div *ngIf="userPosts.length > 0; else noPosts">
+          <div *ngFor="let post of userPosts" class="post">
+            <p>{{ post.content }}</p>
+            <span>{{ post.date | date }}</span>
+          </div>
+        </div>
+        <ng-template #noPosts>
+          <p>You haven't posted yet</p>
+        </ng-template>
+      </div>
+
+      <!-- Education div -->
+      <div class="col-md-12 mt-4">
+        <h4>Education</h4>
+        <div *ngFor="let education of userData?.education">
+          <ion-icon name="school-outline"></ion-icon>
+          <p>{{ education.schoolName }} - {{ education.degree }}</p>
+          <span
+            >{{ education.startDate | date }} -
+            {{ education.endDate | date }}</span
+          >
+          <button *ngIf="editMode" (click)="removeEducation(education)">
+            Remove
+          </button>
+        </div>
+        <button *ngIf="editMode" (click)="addEducation()">Add Education</button>
+      </div>
+
+      <!-- Skills div -->
+      <div class="col-md-12 mt-4">
+        <h4>Skills</h4>
+        <div *ngFor="let skill of userData?.skills">
+          <ion-icon name="bulb-outline"></ion-icon>
+          <p>{{ skill }}</p>
+          <button *ngIf="editMode" (click)="removeSkill(skill)">Remove</button>
+        </div>
+        <button *ngIf="editMode" (click)="addSkill()">Add Skill</button>
+      </div>
+    </div>
+
+    <!-- EDIT FORMA -->
+    <div class="row mt-4" *ngIf="editMode">
+      <div class="col-md-12">
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <h4>Background Image URL</h4>
+            <input
+              type="text"
+              class="form-control"
+              id="backgroundImageUrl"
+              formControlName="backgroundImageUrl"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>Profile Image URL</h4>
+            <input
+              type="text"
+              class="form-control"
+              id="profileImageUrl"
+              formControlName="profileImageUrl"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>First Name</h4>
+            <input
+              type="text"
+              class="form-control"
+              id="firstName"
+              formControlName="firstName"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>Last Name</h4>
+            <input
+              type="text"
+              class="form-control"
+              id="lastName"
+              formControlName="lastName"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>Email</h4>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              formControlName="email"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>Address</h4>
+            <input
+              type="text"
+              class="form-control"
+              id="address"
+              formControlName="address"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>Contact</h4>
+            <input
+              type="text"
+              class="form-control"
+              id="contact"
+              formControlName="contact"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>Education</h4>
+            <input
+              type="text"
+              class="form-control"
+              id="education"
+              formControlName="education"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>Skills</h4>
+            <input
+              type="text"
+              class="form-control"
+              id="skills"
+              formControlName="skills"
+            />
+          </div>
+          <div class="mb-3">
+            <h4>Bio</h4>
+            <textarea
+              class="form-control"
+              id="bio"
+              formControlName="bio"
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+      </div>
+    </div>
+    <!-- END EDIT FORMA -->
+  </div>
+</div>

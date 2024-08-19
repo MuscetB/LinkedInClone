@@ -1,0 +1,63 @@
+<div class="container mt-4">
+  <h3>Search for Users</h3>
+  <form (ngSubmit)="searchUsers()">
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <input
+        type="text"
+        class="form-control"
+        id="location"
+        [(ngModel)]="location"
+        name="location"
+        placeholder="Enter your location (e.g., Zadar)"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="radius" class="form-label">Radius (km)</label>
+      <input
+        type="number"
+        class="form-control"
+        id="radius"
+        [(ngModel)]="radius"
+        name="radius"
+        placeholder="Enter search radius in kilometers"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="skill" class="form-label">Skill</label>
+      <input
+        type="text"
+        class="form-control"
+        id="skill"
+        [(ngModel)]="skill"
+        name="skill"
+        placeholder="Enter skill (e.g., Web Developer)"
+      />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+
+  <div class="mt-4" *ngIf="filteredUsers.length > 0">
+    <h4>Results:</h4>
+    <ul class="list-group">
+      <li *ngFor="let user of filteredUsers" class="list-group-item">
+        {{ user.name }} - {{ user.skill }} - {{ user.location }}
+      </li>
+    </ul>
+  </div>
+
+  <div class="mt-4" *ngIf="showMap">
+    <google-map height="400px" width="100%" [center]="center" [zoom]="zoom">
+      <map-marker
+        *ngFor="let user of filteredUsers"
+        [position]="user.position"
+        [title]="user.name"
+      ></map-marker>
+      <map-circle
+        [center]="center"
+        [radius]="radius * 1000"
+        [options]="circleOptions" 
+      ></map-circle>
+    </google-map>
+  </div>
+</div>

@@ -1,0 +1,71 @@
+.navbar {
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background-color: #f8f9fa;
+  align-items: center;
+}
+
+.container-fluid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.navbar-brand {
+  padding-left: 430px;
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-toggler {
+  margin-left: auto;
+}
+
+.collapse {
+  display: flex;
+  align-items: center;
+  flex-grow: 0;
+}
+
+.ml-auto {
+  margin-right: 10px;
+  transform: translateX(400px);
+}
+
+.form-control {
+  margin-right: 10px;
+  transform: translateX(350px); /* Pomicanje za 400px udesno */
+  position: relative;
+}
+
+.search-dropdown {
+  position: absolute;
+  z-index: 1050; /* Proveri da li je dropdown iznad ostalih elemenata */
+  margin-top: 0.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+  background-color: white; /* Dodano kako bi se pozadina prikazala ispravno */
+}
+
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item img {
+  margin-right: 10px;
+}
+
+body {
+  padding-top: 70px; /* Adjust based on the height of your navbar */
+}

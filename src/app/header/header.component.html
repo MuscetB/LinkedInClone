@@ -1,0 +1,83 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <ion-icon name="logo-linkedin"></ion-icon>
+      <!-- <img src="assets/images/logo.jpg" alt="Logo" style="width: 200px; height: 35px; object-fit: cover; display: flex;"> -->
+      
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" routerLink="/home">
+            <ion-icon name="home-outline"></ion-icon>
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/profile">
+            <ion-icon name="person-outline"></ion-icon>
+            Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/search">
+            <ion-icon name="search-outline"></ion-icon>
+            Search
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link position-relative" routerLink="/chat">
+            <ion-icon name="chatbubble-outline"></ion-icon>
+            Chat
+            <span *ngIf="unreadMessagesCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ unreadMessagesCount }}
+              <span class="visually-hidden">unread messages</span>
+            </span>
+          </a>
+        </li>
+      </ul>
+      <form class="d-flex position-relative">
+        <input class="form-control me-" type="search" placeholder="Search" aria-label="Search" [(ngModel)]="searchQuery" name="searchQuery" (input)="searchUsers()">
+        <div class="dropdown-menu show search-dropdown" *ngIf="searchResults.length > 0">
+          <a *ngFor="let user of searchResults" class="dropdown-item" (click)="viewProfile(user.uid)">
+            <img [src]="user.profileImageUrl || 'path-to-default-profile-image'" class="rounded-circle me-2" alt="Profile Image" style="width: 30px; height: 30px; object-fit: cover;">
+            {{ user.firstName }} {{ user.lastName }}
+          </a>
+        </div>
+      </form>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item" *ngIf="authService.getUser() | async as user; else loggedOut">
+          <a class="nav-link" (click)="logout()">
+            <ion-icon name="log-out-outline"></ion-icon>
+            Logout
+          </a>
+        </li>
+        <ng-template #loggedOut>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login">
+              <ion-icon name="log-in-outline"></ion-icon>
+              Login
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/register">
+              <ion-icon name="person-add-outline"></ion-icon>
+              Register
+            </a>
+          </li>
+        </ng-template>
+      </ul>
+    </div>
+  </div>
+</nav>

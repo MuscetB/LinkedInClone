@@ -1,0 +1,75 @@
+/* profile.component.css */
+.profile-container {
+  width: 100%;
+  max-width: 1260px;
+  margin: 0 auto;
+  background: #ededed;
+  border-radius: 25px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.profile-background {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background: #ededed;
+  border-radius: 25px;
+}
+
+.background-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 25px;
+}
+
+.profile-image {
+  position: absolute;
+  bottom: -50px;
+  left: 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #fff;
+}
+
+.profile-image img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.file-input {
+  display: none;
+}
+
+.profile-info {
+  padding: 20px;
+  text-align: left;
+}
+
+.profile-info h3 {
+  margin: 10px 0 5px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.profile-info p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.profile-info .btn {
+  margin-top: 10px;
+}
+
+.modal-content {
+  border-radius: 10px;
+}
+
+.modal-body img {
+  max-width: 150px;
+  border-radius: 50%;
+}
+
+
