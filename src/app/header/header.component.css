@@ -17,16 +17,17 @@
   position: relative;
 }
 
-.navbar-brand {
+/* .navbar-brand {
   padding-left: 430px;
   position: absolute;
   left: 0;
   display: flex;
   align-items: center;
-}
+} */
 
 .navbar-toggler {
   margin-left: auto;
+  
 }
 
 .collapse {
@@ -35,37 +36,37 @@
   flex-grow: 0;
 }
 
-.ml-auto {
+/* .ml-auto {
   margin-right: 10px;
   transform: translateX(400px);
-}
+} */
 
-.form-control {
+/* .form-control {
   margin-right: 10px;
-  transform: translateX(350px); /* Pomicanje za 400px udesno */
+  transform: translateX(350px); 
   position: relative;
-}
+} */
 
 .search-dropdown {
   position: absolute;
-  z-index: 1050; /* Proveri da li je dropdown iznad ostalih elemenata */
+  z-index: 1050;
   margin-top: 0.25rem;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.25rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
-  background-color: white; /* Dodano kako bi se pozadina prikazala ispravno */
+  background-color: white; 
 }
 
-
-.dropdown-item {
+/* .dropdown-item {
   display: flex;
   align-items: center;
-}
+} */
 
-.dropdown-item img {
+/* .dropdown-item img {
   margin-right: 10px;
 }
 
 body {
-  padding-top: 70px; /* Adjust based on the height of your navbar */
-}
+  padding-top: 70px; 
+} 
+*/

@@ -4,6 +4,7 @@ import { Router } from '@angular/router'; // Dodano
 import { map } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 import { ChatService } from '../chat.service';
+import { HeaderService } from '../header.service';
 import { UserService } from '../user.service'; // Dodano
 
 @Component({
@@ -23,7 +24,8 @@ export class HeaderComponent implements OnInit {
     private chatService: ChatService,
     private firestore: AngularFirestore,
     private userService: UserService, // Dodano
-    private router: Router // Dodano
+    private router: Router, // Dodano
+    public headerService: HeaderService
   ) {}
 
   ngOnInit(): void {

@@ -9,34 +9,6 @@ import { Observable, catchError, map, of } from 'rxjs';
 export class UserService {
   constructor(private firestore: AngularFirestore) {}
 
-  // searchUsers(query: string): Observable<any[]> {
-  //   console.log('Searching for:', query);
-  //   return this.firestore.collection('users', ref => ref
-  //     .orderBy('firstName')
-  //     .startAt(query)
-  //     .endAt(query + '\uf8ff')
-  //   ).valueChanges().pipe(
-  //     map(users => {
-  //       console.log('Users found:', users);
-  //       return users.filter((user: any) =>
-  //         user.firstName.toLowerCase().includes(query.toLowerCase()) ||
-  //         user.lastName.toLowerCase().includes(query.toLowerCase())
-  //       );
-  //     })
-  //   );
-  // }
-  // searchUsers(query: string): Observable<any[]> {
-  //   return this.firestore.collection('users').snapshotChanges().pipe(
-  //     map(actions => actions.map(a => {
-  //       const data = a.payload.doc.data() as any;
-  //       const id = a.payload.doc.id;
-  //       return { id, ...data };
-  //     }).filter((user: any) =>
-  //       user.firstName.toLowerCase().includes(query.toLowerCase()) ||
-  //       user.lastName.toLowerCase().includes(query.toLowerCase())
-  //     ))
-  //   );
-  // }
 
   searchUsers(query: string): Observable<any[]> {
     return this.firestore

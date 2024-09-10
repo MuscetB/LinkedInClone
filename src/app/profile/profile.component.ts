@@ -7,10 +7,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { finalize } from 'rxjs';
 import { AuthService } from '../auth.service';
+import { EducationModalComponent } from '../education-modal/education-modal.component';
 import { GeocodingService } from '../geocoding.service';
 import { ImageModalComponent } from '../image-modal/image-modal.component';
 import { ProfileService } from '../profile.service';
-
+import { SkillsModalComponent } from '../skills-modal/skills-modal.component';
 
 @Component({
   selector: 'app-profile',
@@ -19,12 +20,14 @@ import { ProfileService } from '../profile.service';
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
-  userData: any;
+  userData: any = {
+    education: [],
+    skills: [],
+  };
   editMode: boolean = false;
-  userId: string | null = null;
+  userId: string | undefined;
   userPosts: any[] = []; // Dodano za Activity div
-  
-
+  isCurrentUserProfile: boolean = false; // Dodano za provjeru korisničkog profila
 
   constructor(
     private profileService: ProfileService,
@@ -43,15 +46,18 @@ export class ProfileComponent implements OnInit {
       backgroundImageUrl: [''],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
+      email: [
+        { value: '', disabled: true },
+        [Validators.required, Validators.email],
+      ],
       contact: [''],
       address: [''],
-      education: [''],
-      skills: [''],
+      education: this.fb.array([]),
+      skills: this.fb.array([]),
       bio: [''],
     });
-    
-    this.authService.getUser().subscribe(user => {
+
+    this.authService.getUser().subscribe((user) => {
       if (user) {
         this.userId = user.uid;
       }
@@ -59,78 +65,125 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  this.route.params.subscribe(params => {
-    this.userId = params['userId'];
-    if (this.userId) {
-      this.firestore.collection('users').doc(this.userId).valueChanges().subscribe((userData: any) => {
-        this.userData = userData;
-
-        // Ensure education is initialized as an array
-        if (!this.userData.education) {
-          this.userData.education = [];
+    this.route.params.subscribe(async (params) => {
+      this.userId = params['userId'];
+  
+      if (!this.userId) {
+        const currentUser = await this.afAuth.currentUser;
+        if (currentUser) {
+          this.userId = currentUser.uid;
+          this.isCurrentUserProfile = true;
         }
-
-        this.profileForm.patchValue(userData);
-      });
-    } else {
-      this.afAuth.authState.subscribe(
-        (user) => {
-          if (user) {
-            this.firestore
-              .collection('users')
-              .doc(user.uid)
-              .valueChanges()
-              .subscribe((userData: any) => {
-                this.userData = userData;
-
-                // Ensure education is initialized as an array
-                if (!this.userData.education) {
-                  this.userData.education = [];
-                }
-
-                this.profileForm.patchValue(userData);
-              });
-          } else {
-            console.error('No user data found');
+      }
+  
+      if (this.userId) {
+        await this.loadUserDataAndPosts();
+      }
+    });
+  }
+  
+  
+  async loadUserDataAndPosts(): Promise<void> {
+    try {
+      // Provjera trenutnog korisnika
+      const currentUser = await this.afAuth.currentUser;
+  
+      if (currentUser) {
+        this.isCurrentUserProfile = currentUser.uid === this.userId;
+      }
+  
+      // Dohvat korisničkih podataka
+      this.firestore
+        .collection('users')
+        .doc(this.userId)
+        .valueChanges()
+        .subscribe((userData: any) => {
+          this.userData = userData;
+  
+          // Inicijalizacija education i skills polja ako nisu definirana
+          if (
+            !this.userData.education ||
+            !Array.isArray(this.userData.education)
+          ) {
+            this.userData.education = [];
           }
-        },
-        (error) => {
-          console.error('Error fetching user data: ', error);
-        }
-      );
+          if (!this.userData.skills || !Array.isArray(this.userData.skills)) {
+            this.userData.skills = [];
+          }
+  
+          this.profileForm.patchValue(userData);
+          this.profileForm.setControl(
+            'education',
+            this.fb.array(this.userData.education || [])
+          );
+          this.profileForm.setControl(
+            'skills',
+            this.fb.array(this.userData.skills || [])
+          );
+        });
+  
+      // Dohvat postova za korisnika
+      this.firestore
+        .collection('posts', (ref) =>
+          ref.where('userId', '==', this.userId).orderBy('timestamp', 'desc')
+        )
+        .valueChanges()
+        .subscribe((posts: any[]) => {
+          console.log('Posts:', posts);
+          this.userPosts = posts;
+        });
+  
+    } catch (error) {
+      console.error('Error loading user data and posts:', error);
     }
-  });
-}
-
+  }
+  
+  
+  
 
   onSubmit(): void {
     if (this.profileForm.valid) {
       const userData = this.profileForm.value;
-      this.geocodingService.getCoordinates(userData.address).subscribe(coords => {
-        userData.position = coords;
-        if (this.userId) {
-          this.firestore.collection('users').doc(this.userId).update(userData).then(() => {
-            console.log('Profile updated successfully');
-          }).catch((error) => {
-            console.log('Error updating profile: ', error);
-          });
-        } else {
-          this.afAuth.authState.subscribe(user => {
-            if (user) {
-              this.firestore.collection('users').doc(user.uid).update(userData).then(() => {
+      this.geocodingService.getCoordinates(userData.address).subscribe(
+        (coords) => {
+          userData.position = coords;
+          if (this.userId) {
+            this.firestore
+              .collection('users')
+              .doc(this.userId)
+              .update(userData)
+              .then(() => {
                 console.log('Profile updated successfully');
-              }).catch((error) => {
+                this.toggleEditMode(); // Zatvaranje edit moda nakon ažuriranja
+              })
+              .catch((error) => {
                 console.log('Error updating profile: ', error);
               });
-            }
-          });
+          } else {
+            this.afAuth.authState.subscribe((user) => {
+              if (user) {
+                this.firestore
+                  .collection('users')
+                  .doc(user.uid)
+                  .update(userData)
+                  .then(() => {
+                    console.log('Profile updated successfully');
+                    this.toggleEditMode(); // Zatvaranje edit moda nakon ažuriranja
+                  })
+                  .catch((error) => {
+                    console.log('Error updating profile: ', error);
+                  });
+              }
+            });
+          }
+        },
+        (error) => {
+          console.error('Error getting coordinates for user address: ', error);
         }
-      }, error => {
-        console.error('Error getting coordinates for user address: ', error);
-      });
+      );
     }
   }
-  
+
   openImageModal(imageUrl: string, isProfileImage: boolean): void {
     const modalRef = this.modalService.open(ImageModalComponent);
     modalRef.componentInstance.imageUrl = imageUrl;
@@ -152,45 +205,69 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
-  
-   // Otvaranje image-modal za profilnu sliku
-   openProfileImageModal(): void {
+
+  // Otvaranje image-modal za profilnu sliku
+  openProfileImageModal(): void {
     this.openImageModal(
-      this.profileForm.get('profileImageUrl')?.value || 'assets/images/add-photo.png', true);
+      this.profileForm.get('profileImageUrl')?.value ||
+        'assets/images/add-photo.png',
+      true
+    );
   }
 
   // Otvaranje image-modal za pozadinsku sliku
   openBackgroundImageModal(): void {
     this.openImageModal(
-      this.profileForm.get('backgroundImageUrl')?.value || 'assets/images/background.png', false);
+      this.profileForm.get('backgroundImageUrl')?.value ||
+        'assets/images/background.png',
+      false
+    );
   }
 
   deleteImage(isProfileImage: boolean) {
     if (this.userId) {
-      const imageField = isProfileImage ? 'profileImageUrl' : 'backgroundImageUrl';
-      this.firestore.collection('users').doc(this.userId).update({ [imageField]: null }).then(() => {
-        this.profileForm.patchValue({ [imageField]: null });
-        console.log(`${isProfileImage ? 'Profile' : 'Background'} image deleted successfully`);
-      }).catch(error => {
-        console.error(`Error deleting ${isProfileImage ? 'profile' : 'background'} image: `, error);
-      });
+      const imageField = isProfileImage
+        ? 'profileImageUrl'
+        : 'backgroundImageUrl';
+      this.firestore
+        .collection('users')
+        .doc(this.userId)
+        .update({ [imageField]: null })
+        .then(() => {
+          this.profileForm.patchValue({ [imageField]: null });
+          console.log(
+            `${
+              isProfileImage ? 'Profile' : 'Background'
+            } image deleted successfully`
+          );
+        })
+        .catch((error) => {
+          console.error(
+            `Error deleting ${
+              isProfileImage ? 'profile' : 'background'
+            } image: `,
+            error
+          );
+        });
     }
   }
 
-  
   onProfileImageChange(event: any): void {
     const file = event.target.files[0];
     if (file) {
       const filePath = `profileImages/${file.name}`;
       const fileRef = this.storage.ref(filePath);
       const task = this.storage.upload(filePath, file);
-      task.snapshotChanges().pipe(
-        finalize(() => {
-          fileRef.getDownloadURL().subscribe(url => {
-            this.profileForm.patchValue({ profileImageUrl: url });
-          });
-        })
-      ).subscribe();
+      task
+        .snapshotChanges()
+        .pipe(
+          finalize(() => {
+            fileRef.getDownloadURL().subscribe((url) => {
+              this.profileForm.patchValue({ profileImageUrl: url });
+            });
+          })
+        )
+        .subscribe();
     }
   }
 
@@ -200,16 +277,19 @@ export class ProfileComponent implements OnInit {
       const filePath = `backgroundImages/${file.name}`;
       const fileRef = this.storage.ref(filePath);
       const task = this.storage.upload(filePath, file);
-      task.snapshotChanges().pipe(
-        finalize(() => {
-          fileRef.getDownloadURL().subscribe(url => {
-            this.profileForm.patchValue({ backgroundImageUrl: url });
-          });
-        })
-      ).subscribe();
+      task
+        .snapshotChanges()
+        .pipe(
+          finalize(() => {
+            fileRef.getDownloadURL().subscribe((url) => {
+              this.profileForm.patchValue({ backgroundImageUrl: url });
+            });
+          })
+        )
+        .subscribe();
     }
   }
-  
+
   startChat(): void {
     if (this.userId) {
       this.router.navigate(['/chat', { userId: this.userId }]);
@@ -219,42 +299,141 @@ export class ProfileComponent implements OnInit {
   toggleEditMode() {
     this.editMode = !this.editMode;
   }
-  
-  addEducation(): void {
-     // Ensure that userData.education is an array
-  if (!this.userData.education || !Array.isArray(this.userData.education)) {
-    this.userData.education = [];
+
+  openEducationForm() {
+    const modalRef = this.modalService.open(EducationModalComponent);
+    modalRef.result
+      .then((result) => {
+        if (result) {
+          this.userData.education.push(result);
+          this.updateUserData(); // Funkcija za spremanje u bazu
+        }
+      })
+      .catch((error) => {
+        console.error('Modal dismissed', error);
+      });
   }
 
-  // Add a new blank education object to the array
-  const newEducation = {
-    schoolName: '',
-    degree: '',
-    startDate: '',
-    endDate: ''
-  };
+  openEducationModal(education?: any) {
+    const modalRef = this.modalService.open(EducationModalComponent);
+    if (education) {
+      modalRef.componentInstance.education = education;
+    }
 
-  this.userData.education.push(newEducation);
+    modalRef.componentInstance.educationSaved.subscribe(
+      (savedEducation: any) => {
+        if (!this.userData.education) {
+          this.userData.education = [];
+        }
+        if (education) {
+          // Ažuriraj postojeću edukaciju
+          const index = this.userData.education.indexOf(education);
+          if (index !== -1) {
+            this.userData.education[index] = savedEducation;
+          }
+        } else {
+          // Dodaj novu edukaciju
+          this.userData.education.push(savedEducation);
+        }
+
+        // Spremi ažurirani education array u Firebase
+        this.firestore
+          .collection('users')
+          .doc(this.userId)
+          .update({
+            education: this.userData.education,
+          })
+          .then(() => {
+            console.log('Education saved successfully');
+          })
+          .catch((error) => {
+            console.error('Error saving education: ', error);
+          });
+      }
+    );
   }
 
-  removeEducation(education: any): void {
-    const index = this.userData.education.indexOf(education);
+  removeEducation(index: number): void {
     if (index > -1) {
       this.userData.education.splice(index, 1);
+      this.firestore
+        .collection('users')
+        .doc(this.userId)
+        .update({
+          education: this.userData.education,
+        })
+        .then(() => {
+          console.log('Education removed successfully');
+        })
+        .catch((error) => {
+          console.error('Error removing education: ', error);
+        });
     }
   }
 
-  addSkill(): void {
-    const newSkill = prompt('Enter new skill:');
-    if (newSkill) {
-      this.userData.skills.push(newSkill);
+  openSkillsForm(skill?: any): void {
+    const modalRef = this.modalService.open(SkillsModalComponent);
+
+    if (skill) {
+      modalRef.componentInstance.skill = skill;
     }
+
+    modalRef.componentInstance.skillSaved.subscribe((savedSkill: any) => {
+      if (!this.userData.skills) {
+        this.userData.skills = [];
+      }
+
+      if (skill) {
+        const index = this.userData.skills.indexOf(skill);
+        if (index !== -1) {
+          this.userData.skills[index] = savedSkill;
+        }
+      } else {
+        this.userData.skills.push(savedSkill);
+      }
+
+      this.updateUserData(); // Spremanje ažuriranog niza veština u Firebase
+    });
+
+    modalRef.componentInstance.skillUpdated.subscribe((updatedSkill: any) => {
+      if (!this.userData.skills) {
+        this.userData.skills = [];
+      }
+
+      const index = this.userData.skills.indexOf(skill);
+      if (index !== -1) {
+        this.userData.skills[index] = updatedSkill;
+        this.updateUserData(); // Ažuriraj i spremi promene u Firebase
+      }
+    });
+
+    modalRef.result.catch((error) => {
+      console.error('Modal dismissed', error);
+    });
   }
 
-  removeSkill(skill: string): void {
-    const index = this.userData.skills.indexOf(skill);
+  removeSkill(index: number): void {
     if (index > -1) {
       this.userData.skills.splice(index, 1);
+      this.updateUserData(); // Save the updated skills array in Firebase
+    }
+  }
+
+  updateUserData() {
+    if (this.userId) {
+      this.firestore
+        .collection('users')
+        .doc(this.userId)
+        .update({
+          education: this.userData.education,
+          skills: this.userData.skills,
+        })
+        .then(() => {
+          console.log('User data updated successfully');
+        })
+        .catch((error) => {
+          console.error('Error updating user data: ', error);
+        });
     }
   }
 }

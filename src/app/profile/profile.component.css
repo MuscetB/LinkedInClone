@@ -72,4 +72,130 @@
   border-radius: 50%;
 }
 
+.education-section {
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.education-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.education-card {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+
+.education-card:hover {
+  background-color: #f9f9f9;
+}
+
+.education-icon {
+  margin-right: 15px;
+}
+
+.education-info h5 {
+  margin: 0;
+}
+
+.education-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Općeniti stilovi za sekciju vještina */
+.skills-section {
+  margin-top: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.skills-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.skills-card {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: calc(50% - 15px); /* Adjust this as per your layout needs */
+}
+
+.skills-card:hover {
+  background-color: #e9ecef;
+}
+
+.skills-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.skills-info h5 {
+  margin: 0;
+  font-size: 16px;
+  color: #343a40;
+}
+
+.skills-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.skills-card button {
+  margin-top: 10px;
+  align-self: flex-end;
+  background-color: #dc3545;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.skills-card button:hover {
+  background-color: #c82333;
+}
+
+/* Adjust the styling for smaller screens */
+@media (max-width: 768px) {
+  .skills-card {
+    width: 100%;
+  }
+}
+
+
+
+
+
 

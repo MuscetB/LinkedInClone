@@ -1,105 +1,100 @@
-
-
-.row {
-  padding: 50px;
-  justify-content: center;
+/* Base Styles */
+.container-fluid {
+  max-width: 3200px; /* Max width for large screens */
+  margin: 0 auto; /* Center the container */
 }
 
-.container-fluid{
-  background-color: #ededed;
-  padding-top: 20px;
-}
-
-.mb-3 {
-  border-radius: 25px;
-}
-
-.form-control {
-  border-radius: 50px;
-}
-
-
-.profile-card {
-
-  padding: 10px;
+.profile-card, .main-feed, .chat {
+  margin-bottom: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  background: #fff;
-  border: none;
-  border-radius: 25px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-.profile-header {
-  position: relative;
-  height: 120px;
-  background: #f3f3f3;
-  border-radius: 25px;
-}
-
+/* Adjust text and image sizes */
 .profile-image {
   width: 80px;
   height: 80px;
-  object-fit: cover;
-  object-position: center;
-  border: 2px solid #fff;
-  position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
-.profile-name {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-top: 50px;
-  text-align: center;
-}
-
-.profile-education {
-  font-size: 0.9rem;
-  text-align: center;
-  color: #9e9d9d;
-}
-
-.profile-location {
-  font-size: 0.8rem;
-  color: #9e9d9d;
-  text-align: center;
-}
-
-.grow-network-btn {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.connections-label {
-  font-weight: bold;
-}
-
-.list-group-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card-footer {
-  background: #f3f3f3;
-}
-
-.card-footer a {
-  color: #0073b1;
-}
 .post-profile-image {
   width: 50px;
   height: 50px;
-  object-fit: cover;
-  object-position: center;
 }
 
-/* .logo-img {
-  width: 200px;
-  height: 35px;
+/* Media Queries for Responsiveness */
+@media (max-width: 1200px) {
+  .profile-card, .main-feed, .chat {
+      margin-bottom: 15px;
+      padding: 10px;
+  }
+
+  .profile-image {
+      width: 70px;
+      height: 70px;
+  }
+
+  .post-profile-image {
+      width: 45px;
+      height: 45px;
+  }
+}
+
+@media (max-width: 992px) {
+  .profile-card, .main-feed, .chat {
+      margin-bottom: 10px;
+      padding: 8px;
+  }
+
+  .profile-image {
+      width: 60px;
+      height: 60px;
+  }
+
+  .post-profile-image {
+      width: 40px;
+      height: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-card, .main-feed, .chat {
+      margin-bottom: 5px;
+      padding: 5px;
+  }
+
+  .profile-image {
+      width: 50px;
+      height: 50px;
+  }
+
+  .post-profile-image {
+      width: 35px;
+      height: 35px;
+  }
+
+  .container-fluid {
+      padding: 0 10px;
+  }
+}
+
+body {
+  font-size: 1rem; /* Adjusts with the root element */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 1rem;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+}
+
+.profile-education, .profile-location {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+img {
   max-width: 100%;
-  object-fit: contain;
-} */
+  height: auto;
+}
