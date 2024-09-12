@@ -55,11 +55,10 @@ import { UserService } from './user.service';
     CommonModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({
-      timeOut: 10000, // 10 seconds
+      timeOut: 40000, // 10 seconds
       positionClass: 'toast-top-right', // You can set this to the position you prefer
       preventDuplicates: true,
     })
-    // NgbModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [GeocodingService, ProfileService, UserService, HeaderService],

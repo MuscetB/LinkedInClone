@@ -5,15 +5,19 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  loading: boolean = false;
+
   constructor(
     private afAuth: AngularFireAuth,
     private firestore: AngularFirestore,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService // injektiraj ToastrService za notifikacije
   ) {}
 
   // Funkcija za uklanjanje undefined vrednosti
@@ -68,15 +72,35 @@ export class AuthService {
   }
 
 
-  async logout(): Promise<void> {
-    try {
-      await this.afAuth.signOut();
-      this.router.navigate(['/login']);
-    } catch (error) {
+  async logout() {
+    this.loading = true; // Pokazivanje loadera prije odjave
+  
+    this.afAuth.signOut().then(() => {
+      // Prikaz poruke o uspješnoj odjavi
+      this.toastr.success('Successfully logged out', 'Logout', {
+        timeOut: 3000, // Vrijeme trajanja poruke u milisekundama
+        progressBar: true, // Prikaz progresne trake
+        progressAnimation: 'increasing', // Efekt progresne trake
+        positionClass: 'toast-top-right', // Pozicija poruke
+        closeButton: true // Dodaj zatvaranje gumba na poruku
+      });
+  
+      this.loading = false; // Isključivanje loadera nakon odjave
+      this.router.navigate(['/login']); // Preusmjeravanje na login
+    }).catch((error) => {
+      // Prikaz poruke o neuspjeloj odjavi
+      this.toastr.error('Logout failed. Please try again.', 'Error', {
+        timeOut: 3000,
+        progressBar: true,
+        positionClass: 'toast-top-right',
+        closeButton: true
+      });
+  
+      this.loading = false;
       console.error('Error during logout: ', error);
-      throw error;
-    }
+    });
   }
+  
 
   getUser() {
     return this.afAuth.authState;

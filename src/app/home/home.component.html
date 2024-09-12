@@ -57,15 +57,20 @@
             />
             <div>
               <h6 class="card-title mb-0" (click)="goToProfile(post.userId)">{{ post.userName }}</h6>
-            </div>
+            <!-- Dodaj datum ispod imena korisnika -->
+            <p class="post-date">{{ post.timestamp | date:'short' }}</p> <!-- Dodan datum -->
+          </div>
           </div>
           <hr>
           <p class="card-text">{{ post.content }}</p>
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-hand-thumbs-up"></i></button>
-            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-dots"></i></button>
+          <div class="d-flex justify-content-between align-items-center">
+            <button (click)="toggleLike(post)" class="like-button" [class.liked]="post.likedBy.includes(user.uid)">
+              <i [ngClass]="post.likedBy.includes(user.uid) ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
+              <span>{{ post.likes }}</span>
+            </button>
+            <!-- <button class="btn btn-outline-primary btn-sm"><i class="bi bi-chat-dots"></i></button>
             <button class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-repeat"></i></button>
-            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-send"></i></button>
+            <button class="btn btn-outline-primary btn-sm"><i class="bi bi-send"></i></button> -->
           </div>
         </div>
       </div>
@@ -75,7 +80,7 @@
     <div class="col-lg-3 col-md-4 col-12">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Chat</h5>
+          <h5 class="card-title">Connections</h5>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">User 1</li>
             <li class="list-group-item">User 2</li>

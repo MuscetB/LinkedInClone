@@ -17,7 +17,8 @@ export class HeaderComponent implements OnInit {
   searchQuery: string = '';
   searchResults: any[] = [];
   dropdownStyle: any = {}; // Dodano
-  @ViewChild('searchBox', { static: false }) searchBox!: ElementRef; 
+  @ViewChild('searchBox', { static: false }) searchBox!: ElementRef;
+  loading: boolean = false; 
 
   constructor(
     public authService: AuthService,
@@ -62,8 +63,13 @@ export class HeaderComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout();
+    this.loading = true; // Prikazivanje loadera u komponenti
+
+    this.authService.logout().finally(() => {
+      this.loading = false; // Isključivanje loadera nakon logout-a
+    });
   }
+
   
   positionDropdown(): void {
     const searchBoxPos = this.searchBox.nativeElement.getBoundingClientRect();

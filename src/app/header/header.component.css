@@ -1,72 +1,199 @@
+/* Header styles */
 .navbar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* Rasporedi elemente s lijeva na desno */
   position: fixed;
   width: 100%;
   top: 0;
   left: 0;
   z-index: 1000;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
+  padding: 10px 20px; /* Dodaj padding za više prostora unutar headera */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Dodaj blagi shadow efekt */
   align-items: center;
 }
 
 .container-fluid {
   display: flex;
-  justify-content: center;
   align-items: center;
-  position: relative;
 }
-
-/* .navbar-brand {
-  padding-left: 430px;
-  position: absolute;
-  left: 0;
-  display: flex;
-  align-items: center;
-} */
 
 .navbar-toggler {
   margin-left: auto;
-  
+  border: none; /* Ukloni border oko toggle gumba */
 }
 
 .collapse {
   display: flex;
   align-items: center;
-  flex-grow: 0;
+  flex-grow: 1;
+  justify-content: space-between; /* Razmakni elemente */
 }
 
-/* .ml-auto {
-  margin-right: 10px;
-  transform: translateX(400px);
-} */
+.navbar-brand {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #007bff; /* Boja brenda */
+  display: flex;
+  align-items: center;
+}
 
-/* .form-control {
+.navbar-brand ion-icon {
+  font-size: 2.5rem; /* Povećaj ikonu */
   margin-right: 10px;
-  transform: translateX(350px); 
-  position: relative;
-} */
+}
+
+.navbar-nav .nav-item {
+  margin-left: 20px;
+}
+
+.nav-link {
+  font-size: 2.5rem; /* Povećaj font za linkove */
+  color: #333;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  transition: color 0.2s;
+}
+
+.nav-link ion-icon {
+  margin-right: 8px;
+  font-size: 2.5rem; /* Povećaj ikonu u linkovima */
+}
+
+.nav-link:hover {
+  color: #007bff; /* Hover efekt za linkove */
+}
 
 .search-dropdown {
   position: absolute;
+  top: calc(100% + 10px); /* Postavi dropdown ispod inputa */
+  left: 0;
   z-index: 1050;
-  margin-top: 0.25rem;
+  width: 500px; /* Širina jednaka širini inputa */
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.25rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
-  background-color: white; 
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Dodaj sjenu za efekt lebdenja */
+  animation: fadeIn 0.3s ease; /* Dodaj animaciju za glatki ulazak */
+  padding: 10px; /* Dodaj padding za sadržaj */
+  max-height: 300px; /* Ograničena visina */
+  overflow-y: auto; /* Omogući skrolanje unutar rezultata */
+}
+.form-control {
+  width: 550px; /* Povećaj širinu polja */
+  padding: 8px;
+  font-size: 2.2rem; /* Povećaj veličinu teksta */
+  border: 2px solid #007bff; /* Istakni rub s plavom bojom */
+  border-radius: 20px; /* Dodaj zaobljene rubove */
+  transition: border-color 0.3s ease; /* Dodaj animaciju za prijelaz */
 }
 
-/* .dropdown-item {
+.form-control:focus {
+  border-color: #0056b3; /* Promjena boje rubova kad je input aktivan */
+  box-shadow: 0px 0px 5px rgba(0, 91, 187, 0.5); /* Dodaj svijetloplavi sjaj */
+  outline: none;
+}
+.badge {
+  font-size: 0.9rem;
+  padding: 5px 10px;
+}
+
+.logout-link {
+  font-size: 2.2rem;
+  color: #ff4d4f;
+  cursor: pointer;
+}
+
+.logout-link ion-icon {
+  margin-right: 8px;
+}
+
+@media (max-width: 992px) {
+  .navbar .collapse {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  form .form-control {
+    width: 100%;
+    max-width: none; /* Full width na manjim ekranima */
+  }
+
+  .navbar-brand {
+    font-size: 1.6rem;
+  }
+
+  .nav-link {
+    font-size: 1.2rem;
+  }
+
+  .logout-link {
+    font-size: 1.2rem;
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.dropdown-item {
   display: flex;
   align-items: center;
-} */
-
-/* .dropdown-item img {
-  margin-right: 10px;
+  padding: 10px 15px;
+  font-size: 2.1rem; /* Povećaj veličinu teksta */
+  transition: background-color 0.2s ease; /* Dodaj prijelaz na hover */
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-body {
-  padding-top: 70px; 
-} 
-*/
+.dropdown-item:hover {
+  background-color: #f1f1f1; /* Blaga promjena boje na hover */
+}
+
+.dropdown-item img {
+  width: 60px;
+  height: 60px;
+  margin-right: 20px;
+  border-radius: 50%; /* Okrugla slika profila */
+  object-fit: cover;
+}
+
+.dropdown-item:hover img {
+  transform: scale(1.1); /* Blaga animacija slike na hover */
+  transition: transform 0.2s ease;
+}
+
+.disabled-link {
+  pointer-events: none; /* Onemogućava klikove */
+  color: grey; /* Promjena boje linka da izgleda kao onemogućen */
+  opacity: 0.6; /* Vizualni efekt onemogućenosti */
+}
+.logout-message {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 9999;
+}
+
+.logout-message.show {
+  opacity: 1;
+}
+
+.logout-message.hide {
+  opacity: 0;
+}

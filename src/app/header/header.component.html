@@ -1,9 +1,11 @@
-<nav *ngIf="headerService.isHeaderVisible" class="navbar navbar-expand-lg navbar-light bg-light">
+<nav
+  *ngIf="headerService.isHeaderVisible"
+  class="navbar navbar-expand-lg navbar-light bg-light"
+>
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center" href="#">
       <ion-icon name="logo-linkedin"></ion-icon>
-      <!-- <img src="assets/images/logo.jpg" alt="Logo" style="width: 200px; height: 35px; object-fit: cover; display: flex;"> -->
-      
+      LinkedIn Clone
     </a>
     <button
       class="navbar-toggler"
@@ -40,7 +42,10 @@
           <a class="nav-link position-relative" routerLink="/chat">
             <ion-icon name="chatbubble-outline"></ion-icon>
             Chat
-            <span *ngIf="unreadMessagesCount > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <span
+              *ngIf="unreadMessagesCount > 0"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+            >
               {{ unreadMessagesCount }}
               <span class="visually-hidden">unread messages</span>
             </span>
@@ -48,18 +53,50 @@
         </li>
       </ul>
       <form class="d-flex position-relative">
-        <input class="form-control me-" type="search" placeholder="Search" aria-label="Search" [(ngModel)]="searchQuery" name="searchQuery" (input)="searchUsers()">
-        <div class="dropdown-menu show search-dropdown" *ngIf="searchResults.length > 0">
-          <a *ngFor="let user of searchResults" class="dropdown-item" (click)="viewProfile(user.uid)">
-            <img [src]="user.profileImageUrl || 'path-to-default-profile-image'" class="rounded-circle me-2" alt="Profile Image" style="width: 30px; height: 30px; object-fit: cover;">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+          [(ngModel)]="searchQuery"
+          name="searchQuery"
+          (input)="searchUsers()"
+        />
+        <div
+          class="dropdown-menu show search-dropdown"
+          *ngIf="searchResults.length > 0"
+        >
+          <a
+            *ngFor="let user of searchResults"
+            class="dropdown-item"
+            (click)="viewProfile(user.uid)"
+          >
+            <img
+              [src]="user.profileImageUrl || 'path-to-default-profile-image'"
+              class="rounded-circle me-2"
+              alt="Profile Image"
+            />
             {{ user.firstName }} {{ user.lastName }}
           </a>
         </div>
       </form>
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item" *ngIf="authService.getUser() | async as user; else loggedOut">
-          <a class="nav-link" (click)="logout()">
+        <li
+          class="nav-item"
+          *ngIf="authService.getUser() | async as user; else loggedOut"
+        >
+          <a
+            class="nav-link logout-link"
+            (click)="!authService.loading && logout()"
+            [ngClass]="{ 'disabled-link': authService.loading }"
+          >
             <ion-icon name="log-out-outline"></ion-icon>
+            <span
+              *ngIf="authService.loading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
             Logout
           </a>
         </li>
@@ -67,6 +104,12 @@
           <li class="nav-item">
             <a class="nav-link" routerLink="/login">
               <ion-icon name="log-in-outline"></ion-icon>
+              <span
+                *ngIf="loading"
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
               Login
             </a>
           </li>
