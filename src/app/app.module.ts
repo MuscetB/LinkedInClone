@@ -1,5 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
@@ -8,11 +9,13 @@ import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-// import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
+import { BadgeModule } from 'primeng/badge';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { environment } from '../environments/environments';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
@@ -23,11 +26,13 @@ import { GeocodingService } from './geocoding.service';
 import { HeaderService } from './header.service';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
+import { ImageModalComponent } from './image-modal/image-modal.component';
 import { ProfileService } from './profile.service';
 import { ProfileComponent } from './profile/profile.component';
 import { SearchComponent } from './search/search.component';
 import { SkillsModalComponent } from './skills-modal/skills-modal.component';
 import { UserService } from './user.service';
+
 
 @NgModule({
   declarations: [
@@ -40,6 +45,7 @@ import { UserService } from './user.service';
     ChatComponent,
     EducationModalComponent,
     SkillsModalComponent,
+    ImageModalComponent
   ],
   imports: [
     BrowserModule,
@@ -53,12 +59,20 @@ import { UserService } from './user.service';
     GoogleMapsModule,
     AngularFireAuthModule,
     CommonModule,
+    NgbModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot({
-      timeOut: 40000, // 10 seconds
-      positionClass: 'toast-top-right', // You can set this to the position you prefer
-      preventDuplicates: true,
-    })
+      positionClass: 'toast-top-right', // Pozicija
+      timeOut: 4000, // Vrijeme prikazivanja poruke
+      progressBar: true, // Prikazuje progress bar
+      closeButton: true, // Prikazuje gumb za zatvaranje
+      preventDuplicates: true, // Sprječava duple obavijesti
+      newestOnTop: true, // Nova obavijest će se prikazati na vrhu
+      tapToDismiss: true,
+    }),
+    DialogModule,
+    BadgeModule,
+    ButtonModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [GeocodingService, ProfileService, UserService, HeaderService],

@@ -1,47 +1,152 @@
 <div class="container mt-4">
   <div class="row">
     <!-- Conversations List -->
-    <div class="col-md-4">
+    <div class="col-md-4 conversation-list">
       <h4>Conversations</h4>
       <ul class="list-group">
-        <li *ngFor="let conversation of conversations$ | async" class="list-group-item conversation-item" (click)="selectConversation(conversation)" [ngClass]="{'unread': conversation.unread}">
-          <img [src]="getParticipantProfileImage(conversation)" class="rounded-circle me-2" alt="Profile Image" style="width: 30px; height: 30px; object-fit: cover;">
-          <div class="conversation-details">
-            <div class="conversation-name">{{ getParticipantName(conversation) }}</div>
-            <div class="conversation-snippet">{{ conversation.lastMessage.content }}</div>
+        <li
+          *ngFor="let conversation of conversations$ | async"
+          class="list-group-item conversation-item d-flex justify-content-between"
+          (click)="selectConversation(conversation)"
+          [ngClass]="{ unread: conversation.unread }"
+        >
+          <div class="d-flex align-items-center">
+            <img
+              [src]="getParticipantProfileImage(conversation)"
+              class="rounded-circle me-2"
+              alt="Profile Image"
+              style="width: 30px; height: 30px; object-fit: cover"
+            />
+            <div class="conversation-details">
+              <div class="conversation-name">
+                {{ getParticipantName(conversation) }}
+                <!-- Use the conversation-specific online status -->
+                <span
+                  class="status-circle"
+                  [ngClass]="conversation.isOnline ? 'online' : 'offline'"
+                ></span>
+              </div>
+              <div class="conversation-snippet">
+                {{ conversation.lastMessage.content }}
+              </div>
+            </div>
           </div>
-          <div class="conversation-meta">
-            <div class="conversation-date">{{ conversation.lastMessage.timestamp | date:'MMM d' }}</div>
-            <div *ngIf="conversation.unreadCount" class="badge bg-primary rounded-pill">{{ conversation.unreadCount }}</div>
+    
+          <div class="conversation-meta d-flex align-items-center">
+            <div class="conversation-date me-2">
+              {{ conversation.lastMessage.timestamp | date: 'MMM d' }}
+            </div>
+            <div *ngIf="conversation.unreadCount" class="badge bg-primary rounded-pill me-2">
+              {{ conversation.unreadCount }}
+            </div>
+    
+            <!-- Delete (X) icon -->
+            <i
+              class="fa fa-times delete-icon"
+              (click)="confirmDelete(conversation, $event)"
+              title="Delete Conversation"
+            ></i>
           </div>
         </li>
       </ul>
     </div>
-
+    
     <!-- Messages Section -->
     <div class="col-md-8">
-      <div *ngIf="selectedConversation">
-        <h4>Messages</h4>
-        <div class="message-list">
-          <div *ngFor="let message of messages$ | async" class="message-item" [ngClass]="{'sent': message.senderId === currentUser?.uid, 'received': message.senderId !== currentUser?.uid}">
-            <img [src]="getMessageProfileImage(message)" class="rounded-circle me-2" alt="Profile Image" style="width: 30px; height: 30px; object-fit: cover;">
+      <div
+        *ngIf="selectedConversation; else loadingTemplate"
+        class="position-relative message-container"
+      >
+        <!-- Participant Info (Name and Status) -->
+        <div class="participant-info hanging-info">
+          <div class="d-flex align-items-center">
+            <img
+              [src]="getParticipantProfileImage(selectedConversation)"
+              class="rounded-circle me-2"
+              alt="Profile Image"
+              style="width: 30px; height: 30px; object-fit: cover"
+            />
+            <!-- Name of the participant -->
+            <h5 class="mb-0 me-2">
+              {{ getParticipantName(selectedConversation) }}
+            </h5>
+            <!-- Online Status Indicator -->
+            <span
+              class="status-circle"
+              [ngClass]="userStatus === 'Online' ? 'online' : 'offline'"
+            ></span>
+          </div>
+          <!-- Activity Status Text (e.g., Online / Last active 5 minutes ago) -->
+          <p class="status-text mt-1 mb-0">
+            {{ userStatus === "Online" ? "Online" : userStatus }}
+          </p>
+        </div>
+
+        <!-- Message List -->
+        <div class="message-list" #messageList>
+          <!-- Loop through messages -->
+          <div
+            *ngFor="let message of messages$ | async"
+            class="message-item"
+            [ngClass]="{
+              sent: message.senderId === currentUser?.uid,
+              received: message.senderId !== currentUser?.uid
+            }"
+          >
+            <img
+              [src]="getMessageProfileImage(message)"
+              class="rounded-circle me-2"
+              alt="Profile Image"
+              style="width: 30px; height: 30px; object-fit: cover"
+            />
             <div class="message-content">
               <div class="message-metadata">
-                <span class="message-date">{{ message.timestamp | date:'short' }}</span>
+                <span class="message-date">{{
+                  message.timestamp | date : "short"
+                }}</span>
               </div>
-              <div class="message-text">
-                {{ message.content }}
+              <div class="message-text">{{ message.content }}</div>
+              <!-- Read receipt (show only for sent messages) -->
+              <div
+                *ngIf="
+                  isMessageRead(message) &&
+                  message.senderId === currentUser?.uid
+                "
+                class="read-receipt"
+              >
+                <i class="fa fa-check"></i>
               </div>
             </div>
+          </div>
+
+          <!-- Typing Indicator -->
+          <div *ngIf="typingStatus" class="typing-indicator">
+            {{ typingStatus }}
           </div>
         </div>
 
         <!-- Message Input -->
-        <div class="input-group mt-3">
-          <input type="text" class="form-control" [(ngModel)]="newMessage" placeholder="Type a message">
-          <button class="btn btn-primary" (click)="sendMessage()">Send</button>
+        <div class="input-group mt-3 message-input">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="newMessage"
+            placeholder="Type a message"
+            (keydown.enter)="sendMessage()"
+            (input)="onMessageInput()"
+          />
+          <button class="btn btn-primary btn-send" (click)="sendMessage()">
+            Send
+          </button>
         </div>
       </div>
+
+      <!-- Loader -->
+      <ng-template #loadingTemplate>
+        <div class="loader-container">
+          <div class="loader"></div>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>

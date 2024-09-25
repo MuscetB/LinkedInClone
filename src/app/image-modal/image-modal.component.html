@@ -1,19 +1,52 @@
 <div class="modal-header">
-  <h5 class="modal-title">{{ isProfileImage ? 'Profile Image' : 'Background Image' }}</h5>
-  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+  <h5 class="modal-title">
+    {{ isProfileImage ? "Profile Image" : "Background Image" }}
+  </h5>
+  <button
+    type="button"
+    class="close"
+    aria-label="Close"
+    (click)="activeModal.dismiss()"
+  >
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 
 <div class="modal-body text-center">
-  <img [src]="previewUrl || imageUrl" class="img-fluid mb-3" alt="Image Preview">
-  <div>
-    <input type="file" (change)="onFileSelected($event)">
+  <div class="image-wrapper" *ngIf="!isLoading; else loadingTemplate">
+    <img
+      [src]="previewUrl || imageUrl"
+      class="img-fluid mb-3"
+      alt="Image Preview"
+    />
   </div>
+
+  <!-- Input for file upload if it's the current user's profile -->
+  <div *ngIf="isCurrentUserProfile">
+    <input type="file" (change)="onFileSelected($event)" />
+  </div>
+
+  <!-- Spinner Template -->
+  <ng-template #loadingTemplate>
+    <div class="spinner" role="status">
+      <span class="sr-only"></span>
+    </div>
+  </ng-template>
 </div>
 
-<div class="modal-footer">
-  <button type="button" class="btn btn-danger" (click)="deleteImage()">Delete</button>
-  <button type="button" class="btn btn-primary" (click)="uploadImage()">Upload</button>
-  <button type="button" class="btn btn-secondary" (click)="activeModal.dismiss()">Cancel</button>
+<!-- Buttons for current user's profile only -->
+<div class="modal-footer" *ngIf="isCurrentUserProfile && !isLoading">
+  <button type="button" class="btn btn-danger" (click)="deleteImage()">
+    Delete
+  </button>
+  <button type="button" class="btn btn-primary" (click)="uploadImage()">
+    Upload
+  </button>
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="activeModal.dismiss()"
+  >
+    Cancel
+  </button>
 </div>

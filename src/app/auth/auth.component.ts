@@ -28,7 +28,7 @@ export class AuthComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
+    public authService: AuthService,
     private storage: AngularFireStorage,
     private router: Router,
     private geocodingService: GeocodingService,
@@ -81,15 +81,10 @@ export class AuthComponent implements OnInit {
 
   onSubmit(): void {
     if (this.authForm.invalid && !this.isLoginMode) {
-      console.log(
-        'Form is invalid, but continuing for debugging:',
-        this.authForm.errors
-      );
       this.authForm.markAllAsTouched(); // Mark all fields as touched to show validation errors
-      // Do not return here for debugging purposes
+      return; // Do not return here for debugging purposes
     }
 
-    console.log('Dalje...');
     const email = this.authForm.value.email;
     const password = this.authForm.value.password;
 

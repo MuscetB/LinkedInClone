@@ -1,44 +1,98 @@
 <div class="modal-header">
-    <h5 class="modal-title">{{ education ? 'Edit Education' : 'Add Education' }}</h5>
-    <button type="button" class="close" aria-label="Close" (click)="close()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <form [formGroup]="educationForm" (ngSubmit)="onSubmit()">
-      <div class="mb-3">
-        <label for="schoolName" class="form-label">School*</label>
-        <input type="text" id="schoolName" class="form-control" formControlName="schoolName">
-      </div>
-      <div class="mb-3">
-        <label for="degree" class="form-label">Degree</label>
-        <input type="text" id="degree" class="form-control" formControlName="degree">
-      </div>
-      <div class="mb-3">
-        <label for="fieldOfStudy" class="form-label">Field of study</label>
-        <input type="text" id="fieldOfStudy" class="form-control" formControlName="fieldOfStudy">
-      </div>
-      <div class="mb-3">
-        <label for="startDate" class="form-label">Start date</label>
-        <input type="text" id="startDate" class="form-control" formControlName="startDate">
-      </div>
-      <div class="mb-3">
-        <label for="endDate" class="form-label">End date (or expected)</label>
-        <input type="text" id="endDate" class="form-control" formControlName="endDate">
-      </div>
-      <div class="mb-3">
-        <label for="grade" class="form-label">Grade</label>
-        <input type="text" id="grade" class="form-control" formControlName="grade">
-      </div>
-      <div class="mb-3">
-        <label for="activities" class="form-label">Activities and societies</label>
-        <input type="text" id="activities" class="form-control" formControlName="activities">
-      </div>
-      <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea id="description" class="form-control" formControlName="description"></textarea>
-      </div>
-      <button type="submit" class="btn btn-primary">Save</button>
-    </form>
-  </div>
-  
+  <h5 class="modal-title">
+    {{ education ? "Edit Education" : "Add Education" }}
+  </h5>
+  <button type="button" class="close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="educationForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="schoolName" class="form-label">School*</label>
+      <input
+        type="text"
+        id="schoolName"
+        class="form-control"
+        formControlName="schoolName"
+        [readonly]="!isCurrentUserProfile"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="degree" class="form-label">Degree</label>
+      <input
+        type="text"
+        id="degree"
+        class="form-control"
+        formControlName="degree"
+        [readonly]="!isCurrentUserProfile"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="fieldOfStudy" class="form-label">Field of study</label>
+      <input
+        type="text"
+        id="fieldOfStudy"
+        class="form-control"
+        formControlName="fieldOfStudy"
+        [readonly]="!isCurrentUserProfile"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="startDate" class="form-label">Start date</label>
+      <input
+        type="text"
+        id="startDate"
+        class="form-control"
+        formControlName="startDate"
+        [readonly]="!isCurrentUserProfile"
+        (click)="openStartDatePicker()"
+        placeholder="Select a start date"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="endDate" class="form-label">End date (or expected)</label>
+      <input
+        type="text"
+        id="endDate"
+        class="form-control"
+        formControlName="endDate"
+        [readonly]="!isCurrentUserProfile"
+        (click)="openEndDatePicker()"
+        placeholder="Select an end date"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="grade" class="form-label">Grade</label>
+      <input
+        type="text"
+        id="grade"
+        class="form-control"
+        formControlName="grade"
+        [readonly]="!isCurrentUserProfile"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="activities" class="form-label"
+        >Activities and societies</label
+      >
+      <input
+        type="text"
+        id="activities"
+        class="form-control"
+        formControlName="activities"
+        [readonly]="!isCurrentUserProfile"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea
+        id="description"
+        class="form-control"
+        formControlName="description"
+        [readonly]="!isCurrentUserProfile"
+      ></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" *ngIf="isCurrentUserProfile">Save</button>
+  </form>
+</div>

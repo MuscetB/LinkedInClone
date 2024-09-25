@@ -13,16 +13,20 @@ import { finalize } from 'rxjs/operators';
 export class ImageModalComponent implements OnInit {
   @Input() imageUrl: string | undefined;
   @Input() isProfileImage: boolean | undefined;
+  @Input() isCurrentUserProfile: boolean | undefined;
+
   @Output() onDelete: EventEmitter<void> = new EventEmitter();
   @Output() onImageChange: EventEmitter<string> = new EventEmitter();
+  
   selectedFile: File | null = null;
-  previewUrl: string | ArrayBuffer | null = null; // New for previewing the image
+  previewUrl: string | ArrayBuffer | null = null;
+  isLoading: boolean = false; // New variable for loading state
 
   constructor(
     public activeModal: NgbActiveModal,
     private storage: AngularFireStorage,
     private afAuth: AngularFireAuth,
-    private firestore: AngularFirestore // Dodajemo Firestore ovdje
+    private firestore: AngularFirestore
   ) {}
 
   ngOnInit(): void {}
@@ -32,50 +36,65 @@ export class ImageModalComponent implements OnInit {
     if (file) {
       this.selectedFile = file;
       
-       // Update the preview as soon as a new file is selected
-       const reader = new FileReader();
-       reader.onload = (e: any) => {
-         this.previewUrl = e.target.result;
-       };
-       reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.previewUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
   }
 
   uploadImage(): void {
+    this.isLoading = true; // Start the loading spinner
     this.afAuth.authState.subscribe(user => {
-      if (user) {
-        if (this.selectedFile) {
-          const filePath = `${this.isProfileImage ? 'profileImages' : 'backgroundImages'}/${user.uid}`;
-          const fileRef = this.storage.ref(filePath);
-          const task = this.storage.upload(filePath, this.selectedFile);
+      if (user && this.selectedFile) {
+        const filePath = `${this.isProfileImage ? 'profileImages' : 'backgroundImages'}/${user.uid}`;
+        const fileRef = this.storage.ref(filePath);
+        const task = this.storage.upload(filePath, this.selectedFile);
 
-          task.snapshotChanges().pipe(
-            finalize(() => {
-              fileRef.getDownloadURL().subscribe(url => {
-                this.onImageChange.emit(url);
-                this.activeModal.close(); // Close the modal after upload
-
-                // Ažuriraj korisničke podatke u Firestore s novim URL-om
-                const updateData = this.isProfileImage ? { profileImageUrl: url } : { backgroundImageUrl: url };
-                this.firestore.collection('users').doc(user.uid).update(updateData).then(() => {
-                  console.log("User image URL updated in Firestore successfully!");
-                }).catch(error => {
-                  console.error("Error updating user image URL in Firestore: ", error);
-                });
-
-                this.activeModal.close(); // Zatvori modal nakon uploada
+        task.snapshotChanges().pipe(
+          finalize(() => {
+            fileRef.getDownloadURL().subscribe(url => {
+              this.onImageChange.emit(url);
+              const updateData = this.isProfileImage
+                ? { profileImageUrl: url }
+                : { backgroundImageUrl: url };
+              this.firestore.collection('users').doc(user.uid).update(updateData).then(() => {
+                this.isLoading = false; // Stop the loading spinner
+                this.activeModal.close();
               });
-            })
-          ).subscribe();
-        }
+            });
+          })
+        ).subscribe();
       } else {
-        console.error('User is not authenticated');
+        this.isLoading = false; // Stop loading if something goes wrong
+        console.error('User is not authenticated or no file selected');
       }
     });
   }
 
-  deleteImage() {
-    this.onDelete.emit();
-    this.activeModal.close(); // Zatvori modal nakon brisanja
+  deleteImage(): void {
+    this.isLoading = true; // Start loading spinner
+    this.afAuth.authState.subscribe(user => {
+      if (user) {
+        const defaultImageUrl = this.isProfileImage
+          ? 'assets/images/add-photo.png'
+          : 'assets/images/background.png';
+
+        const updateData = this.isProfileImage
+          ? { profileImageUrl: defaultImageUrl }
+          : { backgroundImageUrl: defaultImageUrl };
+
+        this.firestore.collection('users').doc(user.uid).update(updateData).then(() => {
+          this.onImageChange.emit(defaultImageUrl);
+          this.isLoading = false; // Stop spinner after deleting
+          this.activeModal.close();
+        });
+      } else {
+        this.isLoading = false;
+        console.error('User not authenticated');
+      }
+    });
   }
 }
+

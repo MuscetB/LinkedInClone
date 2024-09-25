@@ -13,6 +13,7 @@
         type="text"
         formControlName="skillName"
         class="form-control"
+        [readonly]="!isCurrentUserProfile"
       />
     </div>
     <div class="form-group">
@@ -22,6 +23,7 @@
         type="text"
         formControlName="relatedField"
         class="form-control"
+        [readonly]="!isCurrentUserProfile"
       />
     </div>
     <div class="form-group">
@@ -31,11 +33,12 @@
         type="text"
         formControlName="experience"
         class="form-control"
+        [readonly]="!isCurrentUserProfile"
       />
     </div>
   </form>
 </div>
-<div class="modal-footer">
+<div class="modal-footer" *ngIf="isCurrentUserProfile">
   <button
     *ngIf="!isUpdateMode"
     type="button"

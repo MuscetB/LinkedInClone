@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -20,18 +21,8 @@ export class AuthService {
     private toastr: ToastrService // injektiraj ToastrService za notifikacije
   ) {}
 
-  // Funkcija za uklanjanje undefined vrednosti
-  // private removeUndefinedFields(obj: any) {
-  //   const cleanedObj: any = {};
-  //   Object.keys(obj).forEach(key => {
-  //     if (obj[key] !== undefined) {
-  //       cleanedObj[key] = obj[key];
-  //     }
-  //   });
-  //   return cleanedObj;
-  // }
-
   async register(email: string, password: string, userData: any): Promise<any> {
+    this.loading = true; // Prikaži loader
     try {
       const userCredential = await this.afAuth.createUserWithEmailAndPassword(email, password);
       const user = userCredential.user;
@@ -39,70 +30,92 @@ export class AuthService {
         const uid = user.uid;
         userData.uid = uid;
         userData.email = email;
-
+  
         // Remove profile image related code
         await this.firestore.collection('users').doc(uid).set(userData);
+  
+        this.toastr.success('Registration successful!', 'Success', {
+          progressBar: true,
+          closeButton: true,
+        });
+        this.router.navigate(['/home']);
+  
         return userCredential;
       } else {
         throw new Error('User is undefined');
       }
     } catch (error) {
       console.error('Error registering user: ', error);
+      this.toastr.error('Registration failed. Please try again.', 'Error', {
+        timeOut: 3000,
+        progressBar: true,
+        closeButton: true,
+      });
       throw error;
+    } finally {
+      this.loading = false; // Ukloni loader
     }
   }
-
+  
   async login(email: string, password: string): Promise<void> {
+    this.loading = true;
     try {
       const userCredential = await this.afAuth.signInWithEmailAndPassword(email, password);
       const user = userCredential.user;
       if (user) {
         const uid = user.uid;
+        await this.setUserOnlineOnLogin(uid);  // Postavi korisnika online
         const doc = await this.firestore.collection('users').doc(uid).get().toPromise();
         if (doc?.exists) {
-          console.log('User data: ', doc.data());
+          this.toastr.success('Login successful!', 'Success', {
+            progressBar: true,
+            closeButton: true,
+          });
+          this.router.navigate(['/home']);
         } else {
           console.log('No user data found for UID: ', uid);
         }
       }
     } catch (error) {
       console.error('Error logging in user: ', error);
-      throw error; // Prosleđivanje greške dalje
+      this.toastr.error('Login failed. Please try again.', 'Error', {
+        timeOut: 3000,
+        progressBar: true,
+        closeButton: true,
+      });
+      throw error;
+    } finally {
+      this.loading = false;
     }
   }
-
-
-  async logout() {
-    this.loading = true; // Pokazivanje loadera prije odjave
   
-    this.afAuth.signOut().then(() => {
-      // Prikaz poruke o uspješnoj odjavi
+  async logout(): Promise<void> {
+    const user = await this.afAuth.currentUser;
+    if (user) {
+      await this.setUserOfflineOnLogout(user.uid);  // Postavi korisnika offline
+    }
+    this.loading = true;
+    try {
+      await this.afAuth.signOut();
       this.toastr.success('Successfully logged out', 'Logout', {
-        timeOut: 3000, // Vrijeme trajanja poruke u milisekundama
-        progressBar: true, // Prikaz progresne trake
-        progressAnimation: 'increasing', // Efekt progresne trake
-        positionClass: 'toast-top-right', // Pozicija poruke
-        closeButton: true // Dodaj zatvaranje gumba na poruku
+        progressBar: true,
+        closeButton: true,
       });
-  
-      this.loading = false; // Isključivanje loadera nakon odjave
-      this.router.navigate(['/login']); // Preusmjeravanje na login
-    }).catch((error) => {
-      // Prikaz poruke o neuspjeloj odjavi
+      this.loading = false;
+      this.router.navigate(['/login']);
+    } catch (error) {
       this.toastr.error('Logout failed. Please try again.', 'Error', {
         timeOut: 3000,
         progressBar: true,
-        positionClass: 'toast-top-right',
-        closeButton: true
+        closeButton: true,
       });
-  
       this.loading = false;
       console.error('Error during logout: ', error);
-    });
+    }
   }
   
 
-  getUser() {
+  getUser(): Observable<any> {
     return this.afAuth.authState;
   }
   
@@ -160,5 +173,31 @@ export class AuthService {
     } catch (error) {
       console.error('Error during Google Sign-In:', error);
     }
+  }
+  
+  // Kada se korisnik prijavi, postavi isOnline na true
+  async updateUserOnlineStatus(userId: string, isOnline: boolean): Promise<void> {
+    const userRef = this.firestore.collection('users').doc(userId);
+    if (isOnline) {
+      await userRef.update({
+        isOnline: true,
+        lastActive: new Date(), // Postavlja se trenutni datum i vrijeme
+      });
+    } else {
+      await userRef.update({
+        isOnline: false,
+        lastActive: new Date(), // Ažuriraj vrijeme zadnje aktivnosti kada postane offline
+      });
+    }
+  }
+
+  // Kada se korisnik prijavi, odmah postavljamo status
+  async setUserOnlineOnLogin(userId: string): Promise<void> {
+    this.updateUserOnlineStatus(userId, true);
+  }
+
+  // Kada se korisnik odjavi, ažuriramo status
+  async setUserOfflineOnLogout(userId: string): Promise<void> {
+    this.updateUserOnlineStatus(userId, false);
   }
 }

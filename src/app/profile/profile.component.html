@@ -1,14 +1,25 @@
 <div class="profile-container">
-  <div class="profile-background">
-    <img
-      [src]="
-        profileForm.get('backgroundImageUrl')?.value ||
-        'assets/images/background.png'
-      "
-      alt="Background Image"
-      class="background-img"
-      (click)="openBackgroundImageModal()"
-    />
+  <div class="profile-photo">
+    <div class="background-image" (click)="openBackgroundImageModal()">
+      <img
+        [src]="
+          profileForm.get('backgroundImageUrl')?.value ||
+          'assets/images/background.png'
+        "
+        alt="Background Image"
+        class="background-img"
+        [ngClass]="{
+          'background-img': !profileForm.get('backgroundImageUrl')?.value
+        }"
+      />
+      <input
+        type="file"
+        (change)="onBackgroundImageChange($event)"
+        class="file-input"
+        *ngIf="editMode && isCurrentUserProfile"
+      />
+    </div>
+
     <div class="profile-image" (click)="openProfileImageModal()">
       <img
         [src]="
@@ -25,44 +36,68 @@
         type="file"
         (change)="onProfileImageChange($event)"
         class="file-input"
-        *ngIf="editMode"
+        *ngIf="editMode && isCurrentUserProfile"
       />
-      
     </div>
-    <input
-      type="file"
-      (change)="onBackgroundImageChange($event)"
-      class="file-input"
-      *ngIf="editMode"
-    />
   </div>
 
   <div class="profile-info container mt-4">
     <!-- Profilne informacije -->
-    <div class="row">
-      <div class="col-md-9">
+    <div class="row align-items-center">
+      <div class="col-md-9 d-flex justify-content-between align-items-center">
+        <div>
         <h3>{{ userData?.firstName }} {{ userData?.lastName }}</h3>
         <p>{{ userData?.education[0]?.degree }}</p>
         <p>
           {{ userData?.skills?.[0]?.skillName || 'No skills added yet' }}
         </p>
-        <p><a href="#">{{ userData?.address }}</a></p>
+        <p>
+          <a href="#">{{ userData?.address }}</a>
+        </p>
         <button
-          class="btn btn-primary me-2"
-          *ngIf="!editMode"
-          (click)="startChat()"
-        >
-          Send Message
-        </button>
+        class="btn btn-primary me-2"
+        *ngIf="!isCurrentUserProfile"
+        (click)="startChat()"
+      >
+        Send Message
+      </button>
+
+      <button
+        class="btn btn-primary"
+        *ngIf="!isCurrentUserProfile && !connectionSent && !isConnected"
+        (click)="sendConnectionRequest()"
+        [attr.data-userid]="userId"
+      >
+        Connect
+      </button>
+
+      <button
+        class="btn btn-outline-danger"
+        *ngIf="!isCurrentUserProfile && isConnected"
+        (click)="confirmUnconnect()"
+      >
+        Unconnect
+      </button>
+      </div>
+      <div>
+        
+      
+       
+
         <button
           class="btn btn-secondary me-2"
           (click)="toggleEditMode()"
-          *ngIf="!editMode"
+          *ngIf="!editMode && isCurrentUserProfile"
+          title="Edit"
         >
-        <span class="material-symbols-outlined" (click)="toggleEditMode()"
-          *ngIf="!editMode" onmouseover="Edit">
-          edit
-        </span>
+          <span
+            class="material-symbols-outlined"
+            (click)="toggleEditMode()"
+            *ngIf="!editMode"
+            onmouseover="Edit"
+          >
+            Edit
+          </span>
         </button>
         <button class="btn btn-secondary" *ngIf="editMode" (click)="onSubmit()">
           Save
@@ -75,19 +110,24 @@
           Cancel
         </button>
       </div>
+      </div>
     </div>
 
     <!-- Novi delovi -->
     <div class="row mt-4">
       <!-- About div -->
-      <div class="col-md-12">
+      <div class="col-md-12 about">
         <h4>About</h4>
         <p>{{ userData?.bio }}</p>
       </div>
       <div class="education-section">
         <div class="section-header">
           <h4>Education</h4>
-          <button class="btn btn-light" (click)="openEducationForm()">
+          <button
+            class="btn btn-light"
+            (click)="openEducationModal()"
+            *ngIf="isCurrentUserProfile"
+          >
             <ion-icon name="add-outline"></ion-icon>
           </button>
         </div>
@@ -120,7 +160,11 @@
       <div class="skills-section">
         <div class="section-header">
           <h4>Skills</h4>
-          <button class="btn btn-light" (click)="openSkillsForm()">
+          <button
+            class="btn btn-light"
+            (click)="openSkillsForm()"
+            *ngIf="isCurrentUserProfile"
+          >
             <ion-icon name="add-outline"></ion-icon>
           </button>
         </div>
@@ -146,7 +190,7 @@
       </div>
 
       <!-- EDIT FORMA -->
-      <div class="row mt-4" *ngIf="editMode">
+      <div class="row mt-4" *ngIf="editMode && isCurrentUserProfile">
         <div class="col-md-12">
           <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
             <div class="mb-3">
@@ -203,30 +247,29 @@
                 formControlName="bio"
               ></textarea>
             </div>
-            <button
-              type="submit"
-              class="btn btn-primary"
-            >
+            <button type="submit" class="btn btn-primary">
               Update Profile Info
             </button>
           </form>
         </div>
       </div>
-      <!-- END EDIT FORMA -->
-    </div>
-    <div class="col-md-12 mt-4" id="activity">
-      <h4>Activity</h4>
-      <div *ngIf="userPosts.length > 0; else noPosts">
-        <div *ngFor="let post of userPosts" class="post card mb-3">
-          <div class="card-body">
-            <p>{{ post.content }}</p>
-            <span class="text-muted">{{ post.timestamp.toDate() | date: 'short' }}</span>
+
+      <div class="col-md-12 mt-4" id="activity">
+        <h4>Activity</h4>
+        <div *ngIf="userPosts.length > 0; else noPosts">
+          <div *ngFor="let post of userPosts" class="post card mb-3">
+            <div class="card-body">
+              <p>{{ post.content }}</p>
+              <span class="text-muted">{{
+                post.timestamp.toDate() | date : "short"
+              }}</span>
+            </div>
           </div>
         </div>
+        <ng-template #noPosts>
+          <p>You haven't posted yet</p>
+        </ng-template>
       </div>
-      <ng-template #noPosts>
-        <p>You haven't posted yet</p>
-      </ng-template>
-    </div>    
+    </div>
   </div>
 </div>

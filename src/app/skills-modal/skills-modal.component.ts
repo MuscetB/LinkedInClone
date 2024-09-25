@@ -14,6 +14,8 @@ export class SkillsModalComponent implements OnInit {
   @Output() skillUpdated = new EventEmitter<any>();
   isUpdateMode: boolean = false;  // Prati da li je forma u modu za ažuriranje
   formChanged: boolean = false; // Ovo će pratiti promjene u formi
+  @Input() isCurrentUserProfile: boolean = false; // Dodajemo isCurrentUserProfile kao input varijablu
+
 
   constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
     this.skillForm = this.fb.group({

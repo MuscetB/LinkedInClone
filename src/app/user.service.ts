@@ -1,6 +1,7 @@
 // user.service.ts
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import firebase from 'firebase/compat/app';
 import { Observable, catchError, map, of } from 'rxjs';
 
 @Injectable({
@@ -26,7 +27,45 @@ export class UserService {
         )
       );
   }
-
+  getUserName(userId: string): Observable<string> {
+    return this.firestore
+      .doc(`users/${userId}`)
+      .valueChanges()
+      .pipe(map((user: any) => `${user.firstName} ${user.lastName}`));
+  }
+  getUserById(userId: string): Observable<any> {
+    return this.firestore
+      .collection('users')
+      .doc(userId)
+      .valueChanges()
+      .pipe(
+        map((userData: any) => {
+          if (!userData) {
+            throw new Error('User not found');
+          }
+          return userData;
+        }),
+        catchError((error) => {
+          console.error('Error fetching user by id:', error);
+          return of(null);
+        })
+      );
+  }
+  getUsersByIds(userIds: string[]): Observable<any[]> {
+    return this.firestore
+      .collection('users', (ref) => ref.where(firebase.firestore.FieldPath.documentId(), 'in', userIds))
+      .snapshotChanges()
+      .pipe(
+        map((actions) => {
+          return actions.map((a: any) => {
+            const data = a.payload.doc.data();
+            const id = a.payload.doc.id;
+            return { id, ...data };
+          });
+        })
+      );
+  }
+  
   getUnreadConversations(userId: string): Observable<any[]> {
     return this.firestore
       .collection('conversations', (ref) =>
@@ -36,37 +75,5 @@ export class UserService {
       )
       .valueChanges();
   }
-
-  getUserName(userId: string): Observable<string> {
-    return this.firestore
-      .doc(`users/${userId}`)
-      .valueChanges()
-      .pipe(map((user: any) => `${user.firstName} ${user.lastName}`));
-  }
-
-  getUserById(userId: string): Observable<any> {
-    return this.firestore
-      .collection('users')
-      .doc(userId)
-      .valueChanges()
-      .pipe(
-        catchError((error) => {
-          console.error('Error fetching user by id:', error);
-          return of(null);
-        })
-      );
-  }
-
-  getUsersByIds(userIds: string[]): Observable<any[]> {
-    return this.firestore
-      .collection('users')
-      .valueChanges()
-      .pipe(
-        map((users: any[]) => users.filter(user => userIds.includes(user.uid))),
-        catchError((error) => {
-          console.error('Error fetching users by ids:', error);
-          return of([]);
-        })
-      );
-  }
+  
 }
