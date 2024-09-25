@@ -59,6 +59,7 @@ export class ProfileService {
       })
     );
   }
+  
   unconnectUser(userId: string): Observable<Promise<void>> {
     return this.authService.getUser().pipe(
       switchMap(currentUser => {

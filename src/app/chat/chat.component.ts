@@ -9,9 +9,9 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable, of, Subscription } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import Swal from 'sweetalert2';
-import { AuthService } from '../auth.service';
-import { ChatService, Conversation, Message } from '../chat.service';
-import { UserService } from '../user.service';
+import { AuthService } from '../services/auth.service';
+import { ChatService, Conversation, Message } from '../services/chat.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-chat',
@@ -105,36 +105,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Metoda za pretplatu na status tipkanja
-  subscribeToTypingStatus(conversationId: string): void {
-    this.typingSubscription = this.chatService
-      .getTypingStatus(conversationId)
-      .subscribe(
-        (statusArray) => {
-          // Filtriraj status tako da prikazuje samo kada drugi korisnik tipka
-          const otherTypingStatus = statusArray.find((status) => {
-            return status.senderId !== this.currentUser?.uid && status.isTyping;
-          });
-
-          if (otherTypingStatus) {
-            this.typingStatus = `${this.getUserName(
-              otherTypingStatus.senderId
-            )} is typing...`;
-            console.log(this.typingStatus);
-          } else {
-            this.typingStatus = ''; // Očisti status ako nitko ne tipka
-          }
-        },
-        (error) => {
-          console.error('Error while subscribing to typing status:', error);
-        }
-      );
-  }
-  getUserName(senderId: string): string {
-    const user = this.userMap.get(senderId);
-    return user ? `${user.firstName} ${user.lastName}` : 'Unknown User';
-  }
-
   selectConversation(conversation: Conversation): void {
     this.selectedConversation = conversation;
     this.listenForUserStatus();
@@ -173,6 +143,11 @@ export class ChatComponent implements OnInit, OnDestroy {
       );
       this.listenForTypingStatus(); // Start listening for typing status
     }
+  }
+
+  getUserName(senderId: string): string {
+    const user = this.userMap.get(senderId);
+    return user ? `${user.firstName} ${user.lastName}` : 'Unknown User';
   }
 
   sendMessage(): void {
@@ -228,6 +203,17 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Get the profile image of the message sender
+  getMessageProfileImage(message: Message): string {
+    const user = this.userMap.get(message.senderId);
+    return user?.profileImageUrl || 'assets/images/add-photo.png';
+  }
+
+  // Check if a message is read
+  isMessageRead(message: Message): boolean {
+    return message.read === true;
+  }
+
   listenForTypingStatus(): void {
     if (this.selectedConversation && this.selectedConversation.id) {
       this.typingSubscription = this.chatService
@@ -253,6 +239,32 @@ export class ChatComponent implements OnInit, OnDestroy {
           }, 3000); // Hide the typing status after 3 seconds
         });
     }
+  }
+
+  // Metoda za pretplatu na status tipkanja
+  subscribeToTypingStatus(conversationId: string): void {
+    this.typingSubscription = this.chatService
+      .getTypingStatus(conversationId)
+      .subscribe(
+        (statusArray) => {
+          // Filtriraj status tako da prikazuje samo kada drugi korisnik tipka
+          const otherTypingStatus = statusArray.find((status) => {
+            return status.senderId !== this.currentUser?.uid && status.isTyping;
+          });
+
+          if (otherTypingStatus) {
+            this.typingStatus = `${this.getUserName(
+              otherTypingStatus.senderId
+            )} is typing...`;
+            console.log(this.typingStatus);
+          } else {
+            this.typingStatus = ''; // Očisti status ako nitko ne tipka
+          }
+        },
+        (error) => {
+          console.error('Error while subscribing to typing status:', error);
+        }
+      );
   }
 
   clearTypingStatus(): void {
@@ -286,29 +298,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
     const user = this.userMap.get(otherParticipantId);
     return user?.profileImageUrl || 'assets/images/add-photo.png';
-  }
-
-  // Get the profile image of the message sender
-  getMessageProfileImage(message: Message): string {
-    const user = this.userMap.get(message.senderId);
-    return user?.profileImageUrl || 'assets/images/add-photo.png';
-  }
-
-  // Check if a message is read
-  isMessageRead(message: Message): boolean {
-    return message.read === true;
-  }
-
-  // Auto-scroll to the bottom of the message list
-  scrollToBottom(): void {
-    setTimeout(() => {
-      try {
-        this.messageList.nativeElement.scrollTop =
-          this.messageList.nativeElement.scrollHeight;
-      } catch (err) {
-        console.error('Error scrolling to bottom:', err);
-      }
-    }, 100);
   }
 
   listenForUserStatus(): void {
@@ -415,5 +404,17 @@ export class ChatComponent implements OnInit, OnDestroy {
           console.error('Error deleting conversation:', error);
         });
     }
+  } 
+  
+  // Auto-scroll to the bottom of the message list
+  scrollToBottom(): void {
+    setTimeout(() => {
+      try {
+        this.messageList.nativeElement.scrollTop =
+          this.messageList.nativeElement.scrollHeight;
+      } catch (err) {
+        console.error('Error scrolling to bottom:', err);
+      }
+    }, 100);
   }
 }

@@ -8,11 +8,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { finalize } from 'rxjs';
 import Swal from 'sweetalert2';
-import { AuthService } from '../auth.service';
 import { EducationModalComponent } from '../education-modal/education-modal.component';
-import { GeocodingService } from '../geocoding.service';
 import { ImageModalComponent } from '../image-modal/image-modal.component';
-import { ProfileService } from '../profile.service';
+import { AuthService } from '../services/auth.service';
+import { GeocodingService } from '../services/geocoding.service';
+import { ProfileService } from '../services/profile.service';
 import { SkillsModalComponent } from '../skills-modal/skills-modal.component';
 
 @Component({
@@ -30,11 +30,10 @@ export class ProfileComponent implements OnInit {
   userId: string | undefined;
   userPosts: any[] = []; // Dodano za Activity div
   isCurrentUserProfile: boolean = false; // Dodano za provjeru korisničkog profila
-  connectionSent: boolean = false;  // Praćenje je li zahtjev već poslan
+  connectionSent: boolean = false; // Praćenje je li zahtjev već poslan
   currentUserId: string | undefined; // Dodano za pohranu trenutnog korisničkog ID-a
   isConnected: boolean = false; // Provjera je li povezan
 
-  
   constructor(
     private profileService: ProfileService,
     private fb: FormBuilder,
@@ -44,8 +43,8 @@ export class ProfileComponent implements OnInit {
     private geocodingService: GeocodingService,
     private router: Router,
     private route: ActivatedRoute,
-    private modalService: NgbModal, 
-    private toastr: ToastrService, // Toastr za notifikacije
+    private modalService: NgbModal,
+    private toastr: ToastrService,
     private authService: AuthService
   ) {
     this.profileForm = this.fb.group({
@@ -73,24 +72,23 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(async (params) => {
-      this.userId = params['userId']; // Dohvati ID korisnika iz URL-a (ako postoji)
+      this.userId = params['userId'];
       // Ako nema userId iz URL-a, postavi trenutnog korisnika
       if (!this.userId) {
         const currentUser = await this.afAuth.currentUser;
         if (currentUser) {
           this.userId = currentUser.uid;
-          this.isCurrentUserProfile = true; // Ovo je profil trenutnog korisnika
+          this.isCurrentUserProfile = true;
         }
       }
 
-      // Ako imamo userId (iz URL-a ili trenutnog korisnika), učitaj podatke
       if (this.userId) {
         await this.loadUserDataAndPosts();
-        this.checkConnection(); // Provjeri status povezanosti
+        this.checkConnection();
       }
     });
   }
-  
+
   async loadUserDataAndPosts(): Promise<void> {
     try {
       // Provjera trenutnog korisnika
@@ -109,7 +107,6 @@ export class ProfileComponent implements OnInit {
         .subscribe((userData: any) => {
           this.userData = userData;
 
-          // Inicijalizacija education i skills polja ako nisu definirana
           if (
             !this.userData.education ||
             !Array.isArray(this.userData.education)
@@ -131,7 +128,6 @@ export class ProfileComponent implements OnInit {
           );
         });
 
-      // Dohvat postova za korisnika
       this.firestore
         .collection('posts', (ref) =>
           ref.where('userId', '==', this.userId).orderBy('timestamp', 'desc')
@@ -189,8 +185,6 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  
-  
   openImageModal(imageUrl: string, isProfileImage: boolean): void {
     const modalRef = this.modalService.open(ImageModalComponent);
     modalRef.componentInstance.imageUrl =
@@ -216,19 +210,22 @@ export class ProfileComponent implements OnInit {
   // Otvaranje image-modal za profilnu sliku
   openProfileImageModal() {
     const modalRef = this.modalService.open(ImageModalComponent);
-    modalRef.componentInstance.imageUrl = this.profileForm.get('profileImageUrl')?.value || 'assets/images/default-profile.png';
-    modalRef.componentInstance.isProfileImage = true; // Set this to true to indicate it's a profile image
-    modalRef.componentInstance.isCurrentUserProfile = true; // Set this based on current user's profile
+    modalRef.componentInstance.imageUrl =
+      this.profileForm.get('profileImageUrl')?.value ||
+      'assets/images/default-profile.png';
+    modalRef.componentInstance.isProfileImage = true;
+    modalRef.componentInstance.isCurrentUserProfile = true;
   }
 
   //Otvaranje image-modal za pozadinsku sliku
   openBackgroundImageModal() {
     const modalRef = this.modalService.open(ImageModalComponent);
-    modalRef.componentInstance.imageUrl = this.profileForm.get('backgroundImageUrl')?.value || 'assets/images/default-background.png';
-    modalRef.componentInstance.isProfileImage = false; // Set this to false to indicate it's a background image
-    modalRef.componentInstance.isCurrentUserProfile = true; // Set this based on current user's profile
+    modalRef.componentInstance.imageUrl =
+      this.profileForm.get('backgroundImageUrl')?.value ||
+      'assets/images/default-background.png';
+    modalRef.componentInstance.isProfileImage = false;
+    modalRef.componentInstance.isCurrentUserProfile = true;
   }
-  
 
   deleteImage(isProfileImage: boolean) {
     if (this.userId) {
@@ -301,46 +298,54 @@ export class ProfileComponent implements OnInit {
       this.router.navigate(['/chat', { userId: this.userId }]);
     }
   }
-  
+
   sendConnectionRequest() {
     const connectionRequest = {
-      from: this.currentUserId,  // Trenutni korisnik (koji šalje zahtjev)
-      to: this.userId,           // Korisnik kojem šalje zahtjev
+      from: this.currentUserId, // Trenutni korisnik (koji šalje zahtjev)
+      to: this.userId, // Korisnik kojem šalje zahtjev
       timestamp: new Date(),
-      status: 'pending'          // Status zahtjeva
+      status: 'pending', // Status zahtjeva
     };
-  
+
     // Provjeri da li već postoji zahtjev između ova dva korisnika
-    this.firestore.collection('connectionRequests', ref => 
-      ref.where('from', '==', this.currentUserId).where('to', '==', this.userId)
-    ).get().subscribe(snapshot => {
-      if (snapshot.empty) {
-        // Ako nema prethodnih zahtjeva, pošalji novi
-        this.firestore.collection('connectionRequests').add(connectionRequest)
-          .then(() => {
-            this.connectionSent = true;  // Oznaka da je zahtjev poslan
-            this.toastr.success('Connection request sent.');
-  
-            // Ažuriraj sve gumbove na Pending
-            this.updatePendingButtons(this.userId!);
-          })
-          .catch((error) => {
-            console.error('Error sending connection request: ', error);
-            this.toastr.error('Failed to send connection request.');
-          });
-      } else {
-        // Ako već postoji zahtjev, ne dozvoli ponovno slanje
-        this.toastr.warning('Connection request already sent.');
-      }
-    });
+    this.firestore
+      .collection('connectionRequests', (ref) =>
+        ref
+          .where('from', '==', this.currentUserId)
+          .where('to', '==', this.userId)
+          .where('status', '==', 'pending')
+      )
+      .get()
+      .subscribe((snapshot) => {
+        if (snapshot.empty) {
+          // Ako nema prethodnih zahtjeva, pošalji novi
+          this.firestore
+            .collection('connectionRequests')
+            .add(connectionRequest)
+            .then(() => {
+              this.connectionSent = true; // Oznaka da je zahtjev poslan
+              this.toastr.success('Connection request sent.');
+
+              // Ažuriraj sve gumbove na Pending
+              this.updatePendingButtons(this.userId!);
+            })
+            .catch((error) => {
+              console.error('Error sending connection request: ', error);
+              this.toastr.error('Failed to send connection request.');
+            });
+        } else {
+          // Ako već postoji zahtjev, ne dozvoli ponovno slanje
+          this.toastr.warning('Connection request already sent.');
+        }
+      });
   }
-  // Funkcija za ažuriranje svih Connect gumbova u Pending
+
   updatePendingButtons(userId: string): void {
     const buttons = document.querySelectorAll(`[data-userid="${userId}"]`);
-    buttons.forEach(button => {
+    buttons.forEach((button) => {
       const htmlButton = button as HTMLButtonElement; // Kastanje u HTMLButtonElement
       htmlButton.textContent = 'Pending';
-      htmlButton.disabled = true;  // Onemogući ponovno klikanje dok se zahtjev ne obradi
+      htmlButton.disabled = true; // Onemogući ponovno klikanje dok se zahtjev ne obradi
     });
   }
 
@@ -366,31 +371,36 @@ export class ProfileComponent implements OnInit {
     const modalRef = this.modalService.open(EducationModalComponent);
     modalRef.componentInstance.education = education;
 
-    console.log('Proslijeđena vrijednost isCurrentUserProfile:', this.isCurrentUserProfile);  // Dodaj ovo za praćenje
+    console.log(
+      'Proslijeđena vrijednost isCurrentUserProfile:',
+      this.isCurrentUserProfile
+    );
 
     // Prosljeđivanje informacije je li trenutni korisnik vlasnik profila
     modalRef.componentInstance.isCurrentUserProfile = this.isCurrentUserProfile;
 
-    modalRef.componentInstance.educationSaved.subscribe((savedEducation: any) => {
-      if (!this.userData.education) {
-        this.userData.education = [];
-      }
-      if (education) {
-        const index = this.userData.education.indexOf(education);
-        if (index !== -1) {
-          this.userData.education[index] = savedEducation;
+    modalRef.componentInstance.educationSaved.subscribe(
+      (savedEducation: any) => {
+        if (!this.userData.education) {
+          this.userData.education = [];
         }
-      } else {
-        this.userData.education.push(savedEducation);
+        if (education) {
+          const index = this.userData.education.indexOf(education);
+          if (index !== -1) {
+            this.userData.education[index] = savedEducation;
+          }
+        } else {
+          this.userData.education.push(savedEducation);
+        }
+        this.updateUserData();
       }
-      this.updateUserData(); // Funkcija za spremanje u bazu, premještena ovdje
-    });
+    );
   }
 
   removeEducation(index: number): void {
     if (index > -1) {
       this.userData.education.splice(index, 1);
-      this.updateUserData()
+      this.updateUserData();
     }
   }
 
@@ -414,7 +424,7 @@ export class ProfileComponent implements OnInit {
         } else {
           this.userData.skills.push(savedSkill);
         }
-  
+
         this.updateUserData();
       });
     }
@@ -423,7 +433,7 @@ export class ProfileComponent implements OnInit {
   removeSkill(index: number): void {
     if (index > -1) {
       this.userData.skills.splice(index, 1);
-      this.updateUserData(); // Save the updated skills array in Firebase
+      this.updateUserData();
     }
   }
 
@@ -444,24 +454,31 @@ export class ProfileComponent implements OnInit {
         });
     }
   }
-  
+
   // Provjera statusa povezivanja
   checkConnection(): void {
     if (this.userId) {
-      this.profileService.checkConnection(this.userId).subscribe((connected: boolean) => {
-        this.isConnected = connected;
-      });
+      this.profileService
+        .checkConnection(this.userId)
+        .subscribe((connected: boolean) => {
+          this.isConnected = connected;
+        });
     }
   }
-  
+
   checkExistingRequests(): void {
-    this.firestore.collection('connectionRequests', ref => 
-      ref.where('from', '==', this.currentUserId).where('to', '==', this.userId)
-    ).valueChanges().subscribe((requests: any[]) => {
-      if (requests.length > 0 && requests[0].status === 'pending') {
-        this.connectionSent = true;  // Ako postoji zahtjev, postavi gumb na Pending
-      }
-    });
+    this.firestore
+      .collection('connectionRequests', (ref) =>
+        ref
+          .where('from', '==', this.currentUserId)
+          .where('to', '==', this.userId)
+      )
+      .valueChanges()
+      .subscribe((requests: any[]) => {
+        if (requests.length > 0 && requests[0].status === 'pending') {
+          this.connectionSent = true; // Ako postoji zahtjev, postavi gumb na Pending
+        }
+      });
   }
 
   // Metoda za potvrdu unconnect-a
@@ -479,15 +496,18 @@ export class ProfileComponent implements OnInit {
       }
     });
   }
-  
-   // Unconnect logika
-   unconnectUser(): void {
-    this.profileService.unconnectUser(this.userId!).subscribe(() => {
-      this.toastr.success('You are no longer connected.');
-      this.isConnected = false; // Ažuriraj status povezanosti
-      this.checkConnection(); // Ponovno provjeri povezivost nakon unconnect-a
-    }, (error) => {
-      this.toastr.error('Failed to unconnect from the user.');
-    });
+
+  // Unconnect logika
+  unconnectUser(): void {
+    this.profileService.unconnectUser(this.userId!).subscribe(
+      () => {
+        this.toastr.success('You are no longer connected.');
+        this.isConnected = false; // Ažuriraj status povezanosti
+        this.checkConnection(); // Ponovno provjeri povezivost nakon unconnect-a
+      },
+      (error) => {
+        this.toastr.error('Failed to unconnect from the user.');
+      }
+    );
   }
 }

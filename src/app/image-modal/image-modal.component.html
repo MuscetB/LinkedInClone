@@ -21,12 +21,10 @@
     />
   </div>
 
-  <!-- Input for file upload if it's the current user's profile -->
   <div *ngIf="isCurrentUserProfile">
     <input type="file" (change)="onFileSelected($event)" />
   </div>
 
-  <!-- Spinner Template -->
   <ng-template #loadingTemplate>
     <div class="spinner" role="status">
       <span class="sr-only"></span>
@@ -34,7 +32,6 @@
   </ng-template>
 </div>
 
-<!-- Buttons for current user's profile only -->
 <div class="modal-footer" *ngIf="isCurrentUserProfile && !isLoading">
   <button type="button" class="btn btn-danger" (click)="deleteImage()">
     Delete

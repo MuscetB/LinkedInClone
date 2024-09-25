@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable, combineLatest } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { AuthService } from './auth.service';
 
 export interface Message {
   content: string;
@@ -24,10 +23,7 @@ export interface Conversation {
   providedIn: 'root',
 })
 export class ChatService {
-  constructor(
-    private firestore: AngularFirestore,
-    private authService: AuthService
-  ) {}
+  constructor(private firestore: AngularFirestore) {}
 
   // Get all conversations for the current user
   getConversations(userId: string): Observable<Conversation[]> {
@@ -82,7 +78,43 @@ export class ChatService {
         })
       );
   }
+  
+  // Create or get an existing conversation between two users
+  createOrGetConversation(participants: string[]): Promise<string> {
+    const participant1 = participants[0];
+    const participant2 = participants[1];
 
+    return this.firestore
+      .collection('conversations', (ref) =>
+        ref.where('participants', 'array-contains', participant1)
+      )
+      .get()
+      .toPromise()
+      .then((snapshot) => {
+        const existingConversation = snapshot?.docs.find((doc) => {
+          const data = doc.data() as Conversation;
+          return data.participants.includes(participant2);
+        });
+
+        if (existingConversation) {
+          return existingConversation.id;
+        } else {
+          const conversation: Omit<Conversation, 'id'> = {
+            participants,
+            lastMessage: {
+              content: '',
+              timestamp: new Date(),
+              senderId: '',
+            },
+          };
+          return this.firestore
+            .collection('conversations')
+            .add(conversation)
+            .then((docRef) => docRef.id);
+        }
+      });
+  }
+  
   // Delete a conversation from Firestore
   deleteConversation(conversationId: string): Promise<void> {
     return this.firestore
@@ -126,42 +158,6 @@ export class ChatService {
     this.firestore.collection('conversations').doc(conversationId).update({
       lastMessage: message,
     });
-  }
-
-  // Create or get an existing conversation between two users
-  createOrGetConversation(participants: string[]): Promise<string> {
-    const participant1 = participants[0];
-    const participant2 = participants[1];
-
-    return this.firestore
-      .collection('conversations', (ref) =>
-        ref.where('participants', 'array-contains', participant1)
-      )
-      .get()
-      .toPromise()
-      .then((snapshot) => {
-        const existingConversation = snapshot?.docs.find((doc) => {
-          const data = doc.data() as Conversation;
-          return data.participants.includes(participant2);
-        });
-
-        if (existingConversation) {
-          return existingConversation.id;
-        } else {
-          const conversation: Omit<Conversation, 'id'> = {
-            participants,
-            lastMessage: {
-              content: '',
-              timestamp: new Date(),
-              senderId: '',
-            },
-          };
-          return this.firestore
-            .collection('conversations')
-            .add(conversation)
-            .then((docRef) => docRef.id);
-        }
-      });
   }
 
   // Mark messages as read in a conversation

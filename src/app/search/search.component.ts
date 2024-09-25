@@ -3,12 +3,11 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { map, Observable, of, startWith } from 'rxjs';
-import { AuthService } from '../auth.service';
-import { GeocodingService } from '../geocoding.service';
-import { NotificationService } from '../notification.service';
-import { ProfileService } from '../profile.service';
+import { AuthService } from '../services/auth.service';
+import { GeocodingService } from '../services/geocoding.service';
+import { NotificationService } from '../services/notification.service';
+import { ProfileService } from '../services/profile.service';
 import { SkillsService } from '../services/skills.service';
-
 
 @Component({
   selector: 'app-search',
@@ -28,8 +27,8 @@ export class SearchComponent implements OnInit {
   locationError: boolean = false;
   currentUser: any;
   skillControl = new FormControl('');
-  filteredSkills$: Observable<string[]> = of([]); // Inicijalizacija kao prazan niz
-  isDropdownVisible: boolean = false; // Dodano svojstvo za upravljanje dropdownom
+  filteredSkills$: Observable<string[]> = of([]);
+  isDropdownVisible: boolean = false;
 
   circleOptions: google.maps.CircleOptions = {
     fillColor: 'lightblue',
@@ -121,21 +120,18 @@ export class SearchComponent implements OnInit {
               user.requestStatus = requests.length > 0 ? 'pending' : null;
             });
         } else {
-          user.requestStatus = 'accepted'; // Ako su povezani
+          user.requestStatus = 'accepted';
         }
       });
     });
   }
 
-  // Funkcija za pregled profila
   viewProfile(user: any): void {
     this.router.navigate(['/profile', user.uid]);
   }
 
-  // Method to start chat if connected
   startChat(user: any) {
     if (user.isConnected) {
-      // Logic to navigate to the chat component
       this.router.navigate(['/chat', { userId: user.uid }]);
     }
   }
@@ -151,7 +147,7 @@ export class SearchComponent implements OnInit {
       return;
     }
     this.locationError = false;
-    
+
     this.geocodingService.getCoordinates(this.location).subscribe(
       (coords) => {
         console.log('Coordinates:', coords);
@@ -170,7 +166,6 @@ export class SearchComponent implements OnInit {
 
           const distance = this.calculateDistance(this.center, user.position);
 
-          // Ensure skills is always treated as an array
           const skillsArray = Array.isArray(user.skills) ? user.skills : [];
 
           const hasMatchingSkill = skillsArray.some((skill: any) => {
@@ -221,8 +216,8 @@ export class SearchComponent implements OnInit {
 
   selectSkill(skill: string): void {
     this.skillControl.setValue(skill);
-    this.filteredSkills$ = of([]); // Resetovanje filtriranih veština
-    this.isDropdownVisible = false; // Sakrivanje dropdowna kada je veština odabrana
+    this.filteredSkills$ = of([]);
+    this.isDropdownVisible = false;
   }
 
   public filterSkills(value: string): string[] {
@@ -235,7 +230,7 @@ export class SearchComponent implements OnInit {
   public onSkillInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const value = input?.value ?? '';
-    this.filteredSkills$ = of(this.filterSkills(value)); // Ažuriranje filteredSkills$
+    this.filteredSkills$ = of(this.filterSkills(value));
   }
 
   public showDropdown(): void {
@@ -245,25 +240,25 @@ export class SearchComponent implements OnInit {
   public hideDropdown(event: FocusEvent): void {
     const relatedTarget = event.relatedTarget as HTMLElement;
     if (relatedTarget && relatedTarget.closest('.list-group')) {
-      return; // Ne zatvarajte dropdown ako se fokus pomera unutar liste
+      return;
     }
 
     setTimeout(() => {
       this.isDropdownVisible = false;
     }, 200);
   }
-  // Dodaj ovu metodu u SearchComponent klasu
+
   focusOnMap(user: any): void {
     // Postavi centar mape na korisnikovu lokaciju
     this.center = { lat: user.position.lat, lng: user.position.lng };
 
     // Povećaj zoom za detaljniji prikaz
-    this.zoom = 15; // Povećaj zoom na detaljnu razinu
+    this.zoom = 15;
 
     // Dodaj jednostavnu animaciju ili efekt
     const mapElement = document.querySelector('google-map');
     if (mapElement) {
-      mapElement.classList.add('map-zoom-animation'); // Klasa za CSS animaciju
+      mapElement.classList.add('map-zoom-animation');
       setTimeout(() => mapElement.classList.remove('map-zoom-animation'), 1000);
     }
   }
@@ -290,7 +285,7 @@ export class SearchComponent implements OnInit {
     const listItem = document.getElementById(`user-${index}`);
 
     if (listItem) {
-      listItem.scrollIntoView({ behavior: 'smooth' }); // Pomakni se do rezultata
+      listItem.scrollIntoView({ behavior: 'smooth' });
       listItem.classList.add('blink'); // Dodaj efekt bljeskanja
       setTimeout(() => listItem.classList.remove('blink'), 3000); // Ukloni efekt nakon 3 sekunde
     }

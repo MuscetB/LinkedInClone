@@ -141,7 +141,7 @@ export class NotificationService {
   }
   
    // Method to show a success notification
-   showSuccess(message: string): void {
+  showSuccess(message: string): void {
     this.toastr.success(message);
   }
 

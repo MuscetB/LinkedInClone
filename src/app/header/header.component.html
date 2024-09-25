@@ -76,6 +76,87 @@
             (click)="toggleNotifications()"
             *ngIf="unreadRequests.length + unreadNotifications.length === 0"
           ></i>
+          <!-- Dialog for notifications -->
+          <p-dialog
+            header="Notifications"
+            [(visible)]="showDialog"
+            [modal]="true"
+            [dismissableMask]="true"
+            class="custom-dialog"
+          >
+            <!-- Connection Requests Section -->
+            <div *ngIf="unreadRequests.length > 0">
+              <h3 class="section-header">Connection Requests</h3>
+              <ul class="list-group">
+                <li
+                  *ngFor="let request of unreadRequests"
+                  class="list-group-item"
+                >
+                  <div
+                    class="d-flex align-items-center clickable"
+                    (click)="viewProfile(request.from || request.uid)"
+                    title="Click to visit {{ request.firstName }}'s profile"
+                  >
+                    <img
+                      [src]="
+                        request.profileImageUrl ||
+                        'path-to-default-profile-image'
+                      "
+                      alt="Profile Image"
+                      class="profile-image"
+                    />
+                    <div>
+                      <h5>{{ request.firstName }} {{ request.lastName }}</h5>
+                    </div>
+                  </div>
+                  <div class="actions">
+                    <button
+                      class="btn btn-outline-primary me-2"
+                      (click)="acceptRequest(request)"
+                    >
+                      Connect
+                    </button>
+                    <button
+                      class="btn btn-outline-danger"
+                      (click)="rejectRequest(request)"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Notifications Section -->
+            <div *ngIf="unreadNotifications.length > 0">
+              <h3 class="section-header">Notifications</h3>
+              <ul class="list-group">
+                <li
+                  *ngFor="let notification of unreadNotifications"
+                  class="list-group-item"
+                >
+                  <div>
+                    <p>{{ notification.message }}</p>
+                    <button
+                      class="btn-mark-read"
+                      (click)="markNotificationAsRead(notification.id)"
+                    >
+                      Mark as read
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- No Notifications or Requests -->
+            <div
+              *ngIf="
+                unreadRequests.length === 0 && unreadNotifications.length === 0
+              "
+            >
+              <p>No new notifications or requests.</p>
+            </div>
+          </p-dialog>
         </li>
       </ul>
 

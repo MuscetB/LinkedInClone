@@ -22,16 +22,16 @@ import { routes } from './app.routes';
 import { AuthComponent } from './auth/auth.component';
 import { ChatComponent } from './chat/chat.component';
 import { EducationModalComponent } from './education-modal/education-modal.component';
-import { GeocodingService } from './geocoding.service';
-import { HeaderService } from './header.service';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
 import { ImageModalComponent } from './image-modal/image-modal.component';
-import { ProfileService } from './profile.service';
 import { ProfileComponent } from './profile/profile.component';
 import { SearchComponent } from './search/search.component';
+import { GeocodingService } from './services/geocoding.service';
+import { HeaderService } from './services/header.service';
+import { ProfileService } from './services/profile.service';
+import { UserService } from './services/user.service';
 import { SkillsModalComponent } from './skills-modal/skills-modal.component';
-import { UserService } from './user.service';
 
 
 @NgModule({

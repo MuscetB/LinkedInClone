@@ -18,9 +18,7 @@
         placeholder="Enter your location (e.g., Zadar)"
       />
       <!-- Upozorenje ako je polje prazno -->
-      <div *ngIf="locationError" class="text-danger">
-        Location is required.
-      </div>
+      <div *ngIf="locationError" class="text-danger">Location is required.</div>
     </div>
 
     <div class="mb-3">
@@ -66,8 +64,7 @@
     <button type="submit" class="btn btn-primary">Search</button>
   </form>
 
-  
-     <!-- Obavijest ako nema pronađenih korisnika -->
+  <!-- Obavijest ako nema pronađenih korisnika -->
   <div *ngIf="filteredUsers.length === 0 && searchAttempted" class="no-results">
     <p>No users found matching your search criteria.</p>
   </div>
@@ -99,7 +96,6 @@
           >
             Connect
           </button>
-          <!-- Show Pending Button if connection request is pending -->
           <button
             class="btn btn-outline-secondary me-2"
             *ngIf="user.requestStatus === 'pending'"
@@ -107,7 +103,6 @@
           >
             Pending
           </button>
-          <!-- Show Send Message Button if already connected -->
           <button
             class="btn btn-success me-2"
             *ngIf="user.isConnected"
@@ -119,8 +114,10 @@
             View Profile
           </button>
         </div>
-        <!-- New button to focus on map -->
-        <button class="btn btn-info btn-small ms-auto" (click)="focusOnMap(user)">
+        <button
+          class="btn btn-info btn-small ms-auto"
+          (click)="focusOnMap(user)"
+        >
           Show on Map
         </button>
       </li>
@@ -142,6 +139,5 @@
         [options]="circleOptions"
       ></map-circle>
     </google-map>
-    
   </div>
 </div>

@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 
-
 @Component({
   selector: 'app-education-modal',
   templateUrl: './education-modal.component.html',
@@ -12,11 +11,22 @@ import Swal from 'sweetalert2';
 export class EducationModalComponent implements OnInit {
   @Input() education: any; // Input da primimo podatke o edukaciji
   @Input() isCurrentUserProfile: boolean = false; // Dodajemo isCurrentUserProfile kao input varijablu
-
   @Output() educationSaved = new EventEmitter<any>(); // Emitiranje obrazovanja nakon spremanja
-  educationForm: FormGroup;
 
-  constructor(public activeModal: NgbActiveModal, private fb: FormBuilder) {
+  educationForm!: FormGroup;
+
+  constructor(public readonly activeModal: NgbActiveModal, private readonly fb: FormBuilder) {
+    this.initializeForm();
+  }
+
+  ngOnInit(): void {
+    if (this.education) {
+      this.educationForm.patchValue(this.education);
+    }
+  }
+
+  // Metoda za inicijalizaciju formulara
+  private initializeForm(): void {
     this.educationForm = this.fb.group({
       schoolName: ['', Validators.required],
       degree: ['', Validators.required],
@@ -29,16 +39,9 @@ export class EducationModalComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    console.log('Primljena vrijednost isCurrentUserProfile u modalu:', this.isCurrentUserProfile); // Provjera u modalu
-    if (this.education) {
-      this.educationForm.patchValue(this.education); // Ako se uređuje, popuniti formu
-    }
-  }
-
   onSubmit() {
     if (this.educationForm.valid) {
-      this.activeModal.close(this.educationForm.value); // Vrati unesene podatke i zatvori modal
+      this.activeModal.close(this.educationForm.value);
     }
   }
 
@@ -52,56 +55,22 @@ export class EducationModalComponent implements OnInit {
   close() {
     this.activeModal.dismiss();
   }
-  
-  openStartDatePicker() {
+
+  openDatePicker(field: 'startDate' | 'endDate', title: string) {
     Swal.fire({
-      title: 'Select Start Date',
-      input: 'date', // Postavite input tip na 'date'
-      inputLabel: 'Start Date',
-      inputPlaceholder: 'Select a start date',
+      title: `Select ${title}`,
+      input: 'date',
+      inputLabel: `${title}`,
+      inputPlaceholder: `Select a ${title.toLowerCase()}`,
       showCancelButton: true,
       confirmButtonText: 'Select',
       cancelButtonText: 'Cancel',
-      inputValidator: (value) => {
-        if (!value) {
-          return 'Please select a valid start date!';
-        }
-        return undefined; // Vraća undefined ako je validacija uspješna
-      },
-      preConfirm: (value) => {
-        return value; // Možete dodati dodatne validacije ako je potrebno
-      },
+      inputValidator: (value) =>
+        !value ? `Please select a valid ${title.toLowerCase()}!` : undefined,
     }).then((result) => {
       if (result.isConfirmed) {
-        this.educationForm.get('startDate')?.setValue(result.value); // Postavljanje odabranog datuma u obrazac
+        this.educationForm.get(field)?.setValue(result.value);
       }
     });
   }
-  
-  openEndDatePicker() {
-    Swal.fire({
-      title: 'Select End Date',
-      input: 'date', // Postavite input tip na 'date'
-      inputLabel: 'End Date',
-      inputPlaceholder: 'Select an end date',
-      showCancelButton: true,
-      confirmButtonText: 'Select',
-      cancelButtonText: 'Cancel',
-      inputValidator: (value) => {
-        if (!value) {
-          return 'Please select a valid end date!';
-        }
-        return undefined; // Vraća undefined ako je validacija uspješna
-      },
-      preConfirm: (value) => {
-        return value; // Možete dodati dodatne validacije ako je potrebno
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.educationForm.get('endDate')?.setValue(result.value); // Postavljanje odabranog datuma u obrazac
-      }
-    });
-  }
-  
-  
 }

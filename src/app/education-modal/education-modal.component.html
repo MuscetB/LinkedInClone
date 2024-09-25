@@ -46,7 +46,7 @@
         class="form-control"
         formControlName="startDate"
         [readonly]="!isCurrentUserProfile"
-        (click)="openStartDatePicker()"
+        (click)="openDatePicker('startDate', 'Start Date')"
         placeholder="Select a start date"
       />
     </div>
@@ -58,7 +58,7 @@
         class="form-control"
         formControlName="endDate"
         [readonly]="!isCurrentUserProfile"
-        (click)="openEndDatePicker()"
+        (click)="openDatePicker('endDate', 'End Date')"
         placeholder="Select an end date"
       />
     </div>

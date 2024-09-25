@@ -20,7 +20,7 @@ export class ImageModalComponent implements OnInit {
   
   selectedFile: File | null = null;
   previewUrl: string | ArrayBuffer | null = null;
-  isLoading: boolean = false; // New variable for loading state
+  isLoading: boolean = false;
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -45,7 +45,7 @@ export class ImageModalComponent implements OnInit {
   }
 
   uploadImage(): void {
-    this.isLoading = true; // Start the loading spinner
+    this.isLoading = true;
     this.afAuth.authState.subscribe(user => {
       if (user && this.selectedFile) {
         const filePath = `${this.isProfileImage ? 'profileImages' : 'backgroundImages'}/${user.uid}`;
@@ -60,21 +60,21 @@ export class ImageModalComponent implements OnInit {
                 ? { profileImageUrl: url }
                 : { backgroundImageUrl: url };
               this.firestore.collection('users').doc(user.uid).update(updateData).then(() => {
-                this.isLoading = false; // Stop the loading spinner
+                this.isLoading = false;
                 this.activeModal.close();
               });
             });
           })
         ).subscribe();
       } else {
-        this.isLoading = false; // Stop loading if something goes wrong
+        this.isLoading = false;
         console.error('User is not authenticated or no file selected');
       }
     });
   }
 
   deleteImage(): void {
-    this.isLoading = true; // Start loading spinner
+    this.isLoading = true;
     this.afAuth.authState.subscribe(user => {
       if (user) {
         const defaultImageUrl = this.isProfileImage
@@ -87,7 +87,7 @@ export class ImageModalComponent implements OnInit {
 
         this.firestore.collection('users').doc(user.uid).update(updateData).then(() => {
           this.onImageChange.emit(defaultImageUrl);
-          this.isLoading = false; // Stop spinner after deleting
+          this.isLoading = false;
           this.activeModal.close();
         });
       } else {
