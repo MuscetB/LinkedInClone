@@ -54,7 +54,6 @@ export class AuthComponent implements OnInit, OnDestroy {
     };
   }
 
-  // Form submission handler
   onSubmit(): void {
     if (this.authForm.invalid && !this.isLoginMode) {
       this.authForm.markAllAsTouched();
@@ -83,7 +82,6 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Function to initialize the form
   private initializeForm(): void {
     this.authForm = this.fb.group({
       firstName: ['', Validators.required],
@@ -134,28 +132,6 @@ export class AuthComponent implements OnInit, OnDestroy {
         console.error('Error during registration: ', error);
       });
   }
-
-  // // Handle image upload
-  // private uploadProfileImage(userId: string, userData: any): void {
-  //   if (this.selectedFile) {
-  //     const filePath = `profileImages/${userId}`;
-  //     const fileRef = this.storage.ref(filePath);
-  //     this.storage
-  //       .upload(filePath, this.selectedFile)
-  //       .snapshotChanges()
-  //       .pipe(
-  //         finalize(() =>
-  //           fileRef.getDownloadURL().subscribe((url) => {
-  //             userData.profileImage = url;
-  //             this.saveUserData(userId, userData);
-  //           })
-  //         )
-  //       )
-  //       .subscribe();
-  //   } else {
-  //     this.saveUserData(userId, userData);
-  //   }
-  // }
 
   // Save user data including geocoding
   private saveUserData(uid: string, userData: any): void {
