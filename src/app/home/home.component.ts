@@ -116,7 +116,7 @@ export class HomeComponent implements OnInit {
         userId: this.user.uid,
         userName: `${this.user.firstName} ${this.user.lastName}`,
         userProfileImageUrl:
-          this.user.profileImageUrl || 'path-to-default-profile-image',
+          this.user.profileImageUrl || 'assets/images/add-photo.png',
         likes: 0,
         likedBy: [],
       };

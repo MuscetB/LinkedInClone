@@ -33,6 +33,7 @@ export class UserService {
       .valueChanges()
       .pipe(map((user: any) => `${user.firstName} ${user.lastName}`));
   }
+  
   getUserById(userId: string): Observable<any> {
     return this.firestore
       .collection('users')

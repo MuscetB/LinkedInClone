@@ -9,7 +9,7 @@
     <div class="col-lg-3 col-md-4 col-12">
       <div class="card profile-card shadow-sm">
         <div class="profile-header">
-          <img [src]="user.profileImageUrl || 'path-to-default-profile-image'"
+          <img [src]="user.profileImageUrl || 'assets/images/add-photo.png'"
                class="rounded-circle profile-image"
                alt="Profile Image" />
         </div>
@@ -72,8 +72,8 @@
           <ul class="list-group">
             <li *ngFor="let user of connectedUsers" class="list-group-item-con">
               <div class="d-flex align-items-center">
-                <img [src]="user.profileImageUrl || 'path-to-default-profile-image'"
-                     alt="Profile Image" class="profile-image-con clickable" 
+                <img [src]="user.profileImageUrl || 'assets/images/add-photo.png'"
+                     alt="Profile Image" class="profile-image-con clickable"
                      (click)="goToProfile(user.uid)" />
                 <div class="ms-2 clickable" (click)="goToProfile(user.uid)">
                   <h5>{{ user.firstName }} {{ user.lastName }}</h5>

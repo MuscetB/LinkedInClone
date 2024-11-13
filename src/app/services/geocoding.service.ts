@@ -15,7 +15,7 @@ export class GeocodingService {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${this.apiKey}`;
     return this.http.get(url).pipe(
       map((response: any) => {
-        console.log('Geocoding API response:', response); // Log the API response
+        console.log('Geocoding API response:', response);
         if (response.status === 'OK' && response.results && response.results.length > 0) {
           return response.results[0].geometry.location;
         }
@@ -23,7 +23,7 @@ export class GeocodingService {
       }),
       catchError((error) => {
         console.error('Error fetching coordinates:', error);
-        return of({ lat: 0, lng: 0 }); // Return a default location or handle error as needed
+        return of({ lat: 0, lng: 0 });
       })
     );
   }
