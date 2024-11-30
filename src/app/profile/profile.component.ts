@@ -87,6 +87,10 @@ export class ProfileComponent implements OnInit {
         this.checkConnection();
       }
     });
+    console.log(
+      'ProfileComponent - IsCurrentUserProfile:',
+      this.isCurrentUserProfile
+    );
   }
 
   async loadUserDataAndPosts(): Promise<void> {
@@ -193,6 +197,10 @@ export class ProfileComponent implements OnInit {
     modalRef.componentInstance.isProfileImage = isProfileImage;
 
     modalRef.componentInstance.isCurrentUserProfile = this.isCurrentUserProfile;
+    console.log(
+      'IsCurrentUserProfile sent to modal:',
+      this.isCurrentUserProfile
+    ); // Dodajte log za provjeru
 
     modalRef.componentInstance.onImageChange.subscribe((newUrl: string) => {
       if (this.isCurrentUserProfile) {
@@ -214,6 +222,13 @@ export class ProfileComponent implements OnInit {
       this.profileForm.get('profileImageUrl')?.value ||
       'assets/images/default-profile.png';
     modalRef.componentInstance.isProfileImage = true;
+    modalRef.componentInstance.isCurrentUserProfile = this.isCurrentUserProfile;
+
+    console.log(
+      'IsCurrentUserProfile sent to modal:',
+      this.isCurrentUserProfile
+    );
+    modalRef.componentInstance.isCurrentUserProfile = undefined; // Resetiranje stare vrijednosti
     modalRef.componentInstance.isCurrentUserProfile = true;
   }
 
@@ -480,7 +495,6 @@ export class ProfileComponent implements OnInit {
         }
       });
   }
-
   // Metoda za potvrdu unconnect-a
   confirmUnconnect(): void {
     Swal.fire({

@@ -8,7 +8,7 @@ import { finalize } from 'rxjs/operators';
 @Component({
   selector: 'app-image-modal',
   templateUrl: './image-modal.component.html',
-  styleUrls: ['./image-modal.component.css']
+  styleUrls: ['./image-modal.component.css'],
 })
 export class ImageModalComponent implements OnInit {
   @Input() imageUrl: string | undefined;
@@ -17,7 +17,7 @@ export class ImageModalComponent implements OnInit {
 
   @Output() onDelete: EventEmitter<void> = new EventEmitter();
   @Output() onImageChange: EventEmitter<string> = new EventEmitter();
-  
+
   selectedFile: File | null = null;
   previewUrl: string | ArrayBuffer | null = null;
   isLoading: boolean = false;
@@ -29,13 +29,18 @@ export class ImageModalComponent implements OnInit {
     private firestore: AngularFirestore
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(
+      'isCurrentUserProfile in ImageModal:',
+      this.isCurrentUserProfile
+    );
+  }
 
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-      
+
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.previewUrl = e.target.result;
@@ -45,27 +50,40 @@ export class ImageModalComponent implements OnInit {
   }
 
   uploadImage(): void {
+    if (!this.isCurrentUserProfile) {
+      console.warn('Unauthorized action: Only the current user can upload images.');
+      return;
+    }
     this.isLoading = true;
-    this.afAuth.authState.subscribe(user => {
+    this.afAuth.authState.subscribe((user) => {
       if (user && this.selectedFile) {
-        const filePath = `${this.isProfileImage ? 'profileImages' : 'backgroundImages'}/${user.uid}`;
+        const filePath = `${
+          this.isProfileImage ? 'profileImages' : 'backgroundImages'
+        }/${user.uid}`;
         const fileRef = this.storage.ref(filePath);
         const task = this.storage.upload(filePath, this.selectedFile);
 
-        task.snapshotChanges().pipe(
-          finalize(() => {
-            fileRef.getDownloadURL().subscribe(url => {
-              this.onImageChange.emit(url);
-              const updateData = this.isProfileImage
-                ? { profileImageUrl: url }
-                : { backgroundImageUrl: url };
-              this.firestore.collection('users').doc(user.uid).update(updateData).then(() => {
-                this.isLoading = false;
-                this.activeModal.close();
+        task
+          .snapshotChanges()
+          .pipe(
+            finalize(() => {
+              fileRef.getDownloadURL().subscribe((url) => {
+                this.onImageChange.emit(url);
+                const updateData = this.isProfileImage
+                  ? { profileImageUrl: url }
+                  : { backgroundImageUrl: url };
+                this.firestore
+                  .collection('users')
+                  .doc(user.uid)
+                  .update(updateData)
+                  .then(() => {
+                    this.isLoading = false;
+                    this.activeModal.close();
+                  });
               });
-            });
-          })
-        ).subscribe();
+            })
+          )
+          .subscribe();
       } else {
         this.isLoading = false;
         console.error('User is not authenticated or no file selected');
@@ -74,8 +92,12 @@ export class ImageModalComponent implements OnInit {
   }
 
   deleteImage(): void {
+    if (!this.isCurrentUserProfile) {
+      console.warn('Unauthorized action: Only the current user can delete images.');
+      return;
+    }
     this.isLoading = true;
-    this.afAuth.authState.subscribe(user => {
+    this.afAuth.authState.subscribe((user) => {
       if (user) {
         const defaultImageUrl = this.isProfileImage
           ? 'assets/images/add-photo.png'
@@ -85,11 +107,15 @@ export class ImageModalComponent implements OnInit {
           ? { profileImageUrl: defaultImageUrl }
           : { backgroundImageUrl: defaultImageUrl };
 
-        this.firestore.collection('users').doc(user.uid).update(updateData).then(() => {
-          this.onImageChange.emit(defaultImageUrl);
-          this.isLoading = false;
-          this.activeModal.close();
-        });
+        this.firestore
+          .collection('users')
+          .doc(user.uid)
+          .update(updateData)
+          .then(() => {
+            this.onImageChange.emit(defaultImageUrl);
+            this.isLoading = false;
+            this.activeModal.close();
+          });
       } else {
         this.isLoading = false;
         console.error('User not authenticated');
@@ -97,4 +123,3 @@ export class ImageModalComponent implements OnInit {
     });
   }
 }
-

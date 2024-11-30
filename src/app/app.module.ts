@@ -34,6 +34,7 @@ import { UserService } from './services/user.service';
 import { SkillsModalComponent } from './skills-modal/skills-modal.component';
 
 
+
 @NgModule({
   declarations: [
     HeaderComponent,
@@ -72,7 +73,8 @@ import { SkillsModalComponent } from './skills-modal/skills-modal.component';
     }),
     DialogModule,
     BadgeModule,
-    ButtonModule
+    ButtonModule,
+    
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [GeocodingService, ProfileService, UserService, HeaderService],

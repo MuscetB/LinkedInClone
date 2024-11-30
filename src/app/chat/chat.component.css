@@ -288,14 +288,14 @@
   }
 }
 
-@keyframes slideIn {
+/* @keyframes slideIn {
   from {
     transform: translateX(-100%);
   }
   to {
     transform: translateX(0);
   }
-}
+} */
 
 @keyframes blink {
   50% {

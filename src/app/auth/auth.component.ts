@@ -164,7 +164,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     this.authService
       .googleSignIn()
       .then(() => console.log('Google Sign-In successful'))
-      .catch((error) => console.error('Google Sign-In error:', error));
+      .catch((error) => console.error('Google Sign-In error:'));
   }
 
   // Handle file selection

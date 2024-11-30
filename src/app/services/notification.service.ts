@@ -50,7 +50,7 @@ export class NotificationService {
         })
       );
   }
-
+  // Prihvaćanje zahtjeva za povezivanje
   acceptConnectionRequest(request: any): Promise<void> {
     const userToUpdate = this.firestore
       .collection('users')
@@ -79,21 +79,36 @@ export class NotificationService {
     );
 
     return Promise.all([userToUpdate, userFromUpdate, requestStatusUpdate])
-      .then(() => {
-        userToName.subscribe((name) => {
-          this.firestore.collection('notifications').add({
-            userId: request.from, // Korisnik koji je poslao zahtjev
-            message: `Your connection request to ${name} has been accepted.`,
-            timestamp: new Date(),
-            read: false,
+    .then(() => {
+      userToName.subscribe((name) => {
+        // Provjeri postoji li već obavijest za ovaj zahtjev
+        this.firestore
+          .collection('notifications', (ref) =>
+            ref
+              .where('userId', '==', request.from)
+              .where('message', '==', `Your connection request to ${name} has been accepted.`)
+          )
+          .get()
+          .subscribe((snapshot) => {
+            if (snapshot.empty) {
+              // Dodaj novu obavijest samo ako ne postoji
+              this.firestore.collection('notifications').add({
+                userId: request.from,
+                message: `Your connection request to ${name} has been accepted.`,
+                timestamp: new Date(),
+                read: false,
+              });
+              this.toastr.success('Connection request accepted.');
+            } else {
+              console.log('Notification already exists. Skipping duplicate.');
+            }
           });
-          this.toastr.success('Connection request accepted.');
-        });
-      })
-      .catch((error) => {
-        console.error('Error accepting request: ', error);
-        this.toastr.error('Failed to accept the request.');
       });
+    })
+    .catch((error) => {
+      console.error('Error accepting request: ', error);
+      this.toastr.error('Failed to accept the request.');
+    });
   }
 
   // Odbijanje zahtjeva za povezivanje
@@ -116,36 +131,49 @@ export class NotificationService {
       });
   }
 
+  // Dohvaćanje nepročitanih obavijesti
   getUnreadNotifications(userId: string): Observable<any[]> {
     return this.firestore
       .collection('notifications', (ref) =>
         ref
           .where('userId', '==', userId)
-          .where('read', '==', false)
+          .where('read', '==', false) // Filtriraj samo nepročitane obavijesti
           .orderBy('timestamp', 'desc')
       )
-      .valueChanges({ idField: 'id' });
-  }
-
-  markNotificationAsRead(notificationId: string): Promise<void> {
-    return this.firestore
-      .collection('notifications')
-      .doc(notificationId)
-      .update({ read: true })
-      .then(() => {
-        console.log('Notification marked as read.');
-      })
-      .catch((error) => {
-        console.error('Error marking notification as read:', error);
-      });
+      .snapshotChanges()
+      .pipe(
+        map((actions) =>
+          actions.map((a) => {
+            const data = a.payload.doc.data() as any;
+            const id = a.payload.doc.id;
+            return { id, ...data };
+          })
+        )
+      );
   }
   
-   // Method to show a success notification
+ // Označavanje obavijesti kao pročitane i brisanje iz baze
+ markNotificationAsReadAndDelete(notificationId: string): Promise<void> {
+  const notificationRef = this.firestore.collection('notifications').doc(notificationId);
+
+  return notificationRef
+    .update({ read: true }) // Ažuriraj status na "pročitano"
+    .then(() => notificationRef.delete()) // Zatim trajno ukloni obavijest
+    .then(() => {
+      this.toastr.success('Notification marked as read and removed.');
+    })
+    .catch((error) => {
+      console.error('Error marking notification as read:', error);
+      this.toastr.error('Failed to mark notification as read.');
+    });
+}
+
+  // Metoda za prikaz uspješne obavijsti
   showSuccess(message: string): void {
     this.toastr.success(message);
   }
 
-  // Method to show an error notification
+  // Metoda za prikaz neuspješne obavijsti
   showError(message: string): void {
     this.toastr.error(message);
   }
