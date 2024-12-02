@@ -1,0 +1,95 @@
+<div class="container-fluid">
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  <div *ngIf="!loading" class="row">
+    <!-- Left Sidebar -->
+    <div class="col-lg-3 col-md-4 col-12">
+      <div class="card profile-card shadow-sm">
+        <div class="profile-header">
+          <img [src]="user.profileImageUrl || 'path-to-default-profile-image'"
+               class="rounded-circle profile-image"
+               alt="Profile Image" />
+        </div>
+        <div class="card-body text-center">
+          <h3 class="profile-name">{{ user.firstName }} {{ user.lastName }}</h3>
+          <p class="profile-education">{{ user.education?.[0]?.degree || 'No education added' }}</p>
+          <p class="profile-location">{{ user.address || "No location available" }}</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <span class="connections-label">Connections</span>
+            <span class="badge bg-secondary">{{ connectedUsers.length || 0 }}</span>
+          </li>
+          <li class="list-group-item">Saved items</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-lg-6 col-md-8 col-12">
+      <div class="card mb-4">
+        <div class="card-body">
+          <form (ngSubmit)="submitPost()">
+            <div class="mb-3">
+              <textarea class="form-control" [(ngModel)]="postContent" name="postContent" rows="3" 
+                        placeholder="What's on your mind?" [disabled]="!userLoaded"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Post</button>
+          </form>
+        </div>
+      </div>
+    
+      <!-- Display Posts -->
+      <div *ngFor="let post of posts | async" class="card mb-3 post-card">
+        <div class="card-body">
+          <div class="d-flex">
+            <img [src]="post.userProfileImageUrl" class="rounded-circle post-profile-image me-3" alt="Profile Image" 
+                 (click)="goToProfile(post.userId)" />
+            <div>
+              <h6 class="card-title mb-0" (click)="goToProfile(post.userId)">{{ post.userName }}</h6>
+              <p class="post-date">{{ post.timestamp | date : 'short' }}</p>
+            </div>
+          </div>
+          <hr />
+          <p class="card-text">{{ post.content }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <button (click)="toggleLike(post)" class="like-button" [class.liked]="post.likedBy.includes(user.uid)">
+              <i [ngClass]="post.likedBy.includes(user.uid) ? 'bi bi-hand-thumbs-up-fill' : 'bi bi-hand-thumbs-up'"></i>
+              <span>{{ post.likes }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="col-lg-3 col-md-4 col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5>Connections</h5>
+          <ul class="list-group">
+            <li *ngFor="let user of connectedUsers" class="list-group-item-con">
+              <div class="d-flex align-items-center">
+                <img [src]="user.profileImageUrl || 'path-to-default-profile-image'"
+                     alt="Profile Image" class="profile-image-con clickable" 
+                     (click)="goToProfile(user.uid)" />
+                <div class="ms-2 clickable" (click)="goToProfile(user.uid)">
+                  <h5>{{ user.firstName }} {{ user.lastName }}</h5>
+                  <h6><strong>Skills:</strong><span *ngFor="let skill of user.skills; let i = index">
+                    {{ skill.skillName }}<span *ngIf="i < user.skills.length - 1">, </span>
+                  </span></h6>
+                </div>
+                <div class="ms-auto">
+                  <button class="btn btn-primary send-message-btn" (click)="sendMessage(user.uid)">
+                    <i class="bi bi-chat"></i>
+                  </button>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    

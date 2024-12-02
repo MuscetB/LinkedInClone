@@ -1,0 +1,216 @@
+/* Container styling */
+.container {
+  font-family: 'Arial', sans-serif;
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 100px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Form styling */
+.form-control {
+  border-radius: 20px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #0077b5;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #005582;
+  box-shadow: 0 0 10px rgba(0, 119, 181, 0.2);
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: #0077b5;
+  border-radius: 25px;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #005582;
+  transform: scale(1.05);
+}
+
+/* Results list styling */
+.list-group-item {
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.list-group-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.list-group-item h5 {
+  color: #333;
+}
+
+.list-group-item p {
+  margin: 5px 0;
+  color: #555;
+}
+
+.list-group-item strong {
+  color: #0077b5;
+}
+
+/* Map styling */
+.google-map {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+  }
+  to {
+      opacity: 1;
+  }
+}
+
+.actions {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.connect-btn,
+.follow-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.connect-btn {
+  background-color: #007BFF;
+  color: white;
+}
+
+.connect-btn:hover {
+  background-color: #0056b3;
+}
+
+.follow-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.follow-btn:hover {
+  background-color: #218838;
+}
+
+/* Fine-tuning for button positioning and size */
+.btn-small {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px;
+  font-size: 10px;       /* Manji font */
+  padding: 2px 4px;      /* Manji padding */
+  height: auto;          /* Prilagodba visine */
+}
+
+.actions .btn-info {
+  margin-left: auto;     /* Gumb za mapu skroz desno */
+  margin-top: 5px;       /* Malo razmaka ispod ostalih gumbova */
+}
+
+/* Dropdown styling for skills */
+.list-group-item-action {
+  font-size: 14px; /* Smanjena veličina teksta */
+  padding: 8px 12px; /* Prilagođeni padding */
+}
+
+.list-group {
+  max-height: 150px; /* Ograničena visina za prikaz 4 veštine */
+  overflow-y: auto; /* Vertikalno skrolanje */
+  border: 1px solid #ccc; /* Dodan obrub */
+  border-radius: 4px; /* Zaobljeni uglovi */
+  background-color: #fff; /* Pozadina */
+}
+
+.list-group-item-action:hover {
+  background-color: #f8f9fa; /* Efekat hovera */
+}
+
+.list-group::-webkit-scrollbar {
+  width: 16px; /* Stanjena širina scrollbar-a */
+}
+
+.list-group::-webkit-scrollbar-thumb {
+  background-color: #0077b5; /* Boja scrollbar-a */
+  border-radius: 10px; /* Zaobljeni scrollbar */
+}
+
+.list-group::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Pozadina track-a */
+}
+
+/* Dodaj animaciju za mapu */
+.map-zoom-animation {
+  animation: zoomAnimation 0.5s ease-in-out;
+}
+
+@keyframes zoomAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1); /* Lagano uvećanje */
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Stil za isticanje rezultata */
+.blink {
+  animation: blinkEffect 1s ease-in-out 3; /* 3 puta bljesne */
+}
+
+@keyframes blinkEffect {
+  0% { background-color: #fff; }
+  50% { background-color: #ffeeba; }
+  100% { background-color: #fff; }
+}
+
+.no-results {
+  text-align: center;
+  color: #ff0000; /* Boja za naglašavanje */
+  font-weight: bold;
+  margin-top: 20px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animacija */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.text-danger {
+  color: #ff0000; /* Crvena boja za isticanje greške */
+  font-weight: bold;
+  margin-top: 5px;
+}

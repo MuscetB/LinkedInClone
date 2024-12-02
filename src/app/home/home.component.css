@@ -1,0 +1,284 @@
+/* General container styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Visina da cijela stranica bude pokrivena */
+}
+
+.container-fluid {
+  flex-grow: 1; /* Da raste unutar tijela */
+  background-color: #F4F4F4 !important;
+  padding: 10px 100px 100px 100px
+}
+
+/* Profilna slika i sidebar */
+.profile-card {
+  padding: 20px;
+  text-align: center;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 15px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+
+.badge {
+margin-left: 10px;}
+
+/* Sidebar section */
+.list-group-item {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Dodaj sjenu */
+  transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+  transform: translateY(-5px); /* Lagano pomicanje na hover */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Povećana sjena na hover */
+}
+
+.connections-label {
+  font-size: 1.2rem;
+  color: #007bff;
+}
+
+.grow-network-btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.grow-network-btn:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
+
+/* Main feed */
+textarea.form-control {
+  font-size: 1.2rem;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.post-profile-image {
+  width: 60px;
+  height: 60px;
+  margin-right: 10px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.card {
+  background-color: white;
+  border: 1px solid #ddd; /* Blagi obrub */
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+.card-title:hover {
+  color: #0056b3;
+}
+
+.card-text {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.like-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-size: 1.2rem;
+}
+
+.like-button i {
+  font-size: 1.5rem; /* Veličina ikone */
+  color: #007bff; /* Plava boja obrisa ikone dok nije kliknuto */
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.like-button:hover i {
+  transform: scale(1.2); /* Povećanje ikone na hover */
+}
+
+.like-button span {
+  margin-left: 8px; /* Razmak između ikone i broja lajkova */
+  font-size: 1rem; /* Veličina teksta za broj lajkova */
+  color: #007bff; /* Plava boja broja lajkova */
+  font-weight: bold;
+}
+/* Kada je gumb lajkan, samo unutrašnjost ikone se puni bojom */
+.like-button.liked i {
+  color: #007bff; /* Plava unutrašnjost ikone */
+  fill: #007bff; /* Dodajemo fill svojstvo ako je moguće za popunjene ikonice */
+}
+
+.like-button.liked span {
+  color: #007bff; /* Boja broja lajkova ostaje plava */
+}
+
+/* Uklanjanje obruba oko gumba */
+.like-button:focus {
+  outline: none;
+}
+
+/* Right sidebar */
+.profile-image-con {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.list-group-item-con {
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.list-group-item-con:hover {
+  background-color: #f1f1f1;
+  transform: translateY(-3px);
+}
+
+h5 {
+  font-size: 1rem;
+  margin: 0;
+  color: #333;
+}
+
+h6 {
+  font-size: 0.7rem;
+  margin: 0;
+  color: #333;
+}
+
+p {
+  font-size: 1rem;
+  color: #666;
+}
+
+/* Chat Icon Button */
+.send-message-btn {
+  background-color: #007bff; /* Primary blue color */
+  border: none;
+  border-radius: 50%; /* Round button */
+  width: 35px; /* Set fixed width */
+  height: 35px; /* Set fixed height */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.send-message-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  transform: scale(1.1); /* Slightly increase size on hover */
+}
+
+.send-message-btn i {
+  font-size: 1.4rem; /* Adjust icon size */
+  color: white;
+}
+
+/* Chat Icon Button for small screen responsiveness */
+@media (max-width: 768px) {
+  .send-message-btn {
+    width: 35px; /* Smaller size for small screens */
+    height: 35px;
+    font-size: 1.2rem;
+  }
+}
+
+
+
+/* Loader Animation */
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3rem;
+}
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

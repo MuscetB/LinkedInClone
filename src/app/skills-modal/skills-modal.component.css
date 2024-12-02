@@ -1,0 +1,18 @@
+.close {
+    position: absolute;
+    right: 10px;
+}
+/* Stil za gumb 'Update' kada je onemogućen */
+.btn-update:disabled {
+    background-color: #6c757d; /* Siva boja */
+    border-color: #6c757d;
+    color: white;
+  }
+  
+  /* Stil za gumb 'Update' kada je omogućen */
+  .btn-update {
+    background-color: #007bff; /* Plava boja */
+    border-color: #007bff;
+    color: white;
+  }
+  

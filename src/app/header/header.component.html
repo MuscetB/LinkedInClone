@@ -1,0 +1,229 @@
+<nav
+  *ngIf="headerService.isHeaderVisible"
+  class="navbar navbar-expand-lg navbar-light bg-light"
+>
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center" routerLink="/home">
+      <ion-icon name="logo-linkedin"></ion-icon>
+      LinkedIn Clone
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/home"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <ion-icon name="home-outline"></ion-icon>
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/profile"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <ion-icon name="person-outline"></ion-icon>
+            Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/search"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >
+            <ion-icon name="search-outline"></ion-icon>
+            Search
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link position-relative"
+            routerLink="/chat"
+            routerLinkActive="active"
+          >
+            <ion-icon name="chatbubble-outline"></ion-icon>
+            Chat
+          </a>
+        </li>
+        <li class="nav-item position-relative">
+          <i
+            class="pi pi-bell notification-icon"
+            (click)="toggleNotifications()"
+            pBadge
+            [value]="unreadRequests.length + unreadNotifications.length"
+            *ngIf="unreadRequests.length + unreadNotifications.length > 0"
+          ></i>
+          <i
+            class="pi pi-bell notification-icon"
+            (click)="toggleNotifications()"
+            *ngIf="unreadRequests.length + unreadNotifications.length === 0"
+          ></i>
+          <!-- Dialog for notifications -->
+          <p-dialog
+            header="Notifications"
+            [(visible)]="showDialog"
+            [modal]="true"
+            [dismissableMask]="true"
+            class="custom-dialog"
+          >
+            <!-- Connection Requests Section -->
+            <div *ngIf="unreadRequests.length > 0">
+              <h3 class="section-header">Connection Requests</h3>
+              <ul class="list-group">
+                <li
+                  *ngFor="let request of unreadRequests"
+                  class="list-group-item"
+                >
+                  <div
+                    class="d-flex align-items-center clickable"
+                    (click)="viewProfile(request.from || request.uid)"
+                    title="Click to visit {{ request.firstName }}'s profile"
+                  >
+                    <img
+                      [src]="
+                        request.profileImageUrl ||
+                        'path-to-default-profile-image'
+                      "
+                      alt="Profile Image"
+                      class="profile-image"
+                    />
+                    <div>
+                      <h5>{{ request.firstName }} {{ request.lastName }}</h5>
+                    </div>
+                  </div>
+                  <div class="actions">
+                    <button
+                      class="btn btn-outline-primary me-2"
+                      (click)="acceptRequest(request)"
+                    >
+                      Connect
+                    </button>
+                    <button
+                      class="btn btn-outline-danger"
+                      (click)="rejectRequest(request)"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Notifications Section -->
+            <div *ngIf="unreadNotifications.length > 0">
+              <h3 class="section-header">Notifications</h3>
+              <ul class="list-group">
+                <li
+                  *ngFor="let notification of unreadNotifications"
+                  class="list-group-item"
+                >
+                  <div>
+                    <p>{{ notification.message }}</p>
+                    <button
+                      class="btn-mark-read"
+                      (click)="markNotificationAsRead(notification.id)"
+                    >
+                      Mark as read
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- No Notifications or Requests -->
+            <div
+              *ngIf="
+                unreadRequests.length === 0 && unreadNotifications.length === 0
+              "
+            >
+              <p>No new notifications or requests.</p>
+            </div>
+          </p-dialog>
+        </li>
+      </ul>
+
+      <form class="d-flex position-relative">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+          [(ngModel)]="searchQuery"
+          name="searchQuery"
+          (input)="searchUsers()"
+        />
+        <div
+          class="dropdown-menu show search-dropdown"
+          *ngIf="searchResults.length > 0"
+        >
+          <a
+            *ngFor="let user of searchResults"
+            class="dropdown-item"
+            (click)="viewProfile(user.uid)"
+          >
+            <img
+              [src]="user.profileImageUrl || 'path-to-default-profile-image'"
+              class="rounded-circle me-2"
+              alt="Profile Image"
+            />
+            {{ user.firstName }} {{ user.lastName }}
+          </a>
+        </div>
+      </form>
+
+      <ul class="navbar-nav ml-auto">
+        <li
+          class="nav-item"
+          *ngIf="authService.getUser() | async as user; else loggedOut"
+        >
+          <a
+            class="nav-link logout-link"
+            (click)="!authService.loading && logout()"
+            [ngClass]="{ 'disabled-link': authService.loading }"
+          >
+            <ion-icon name="log-out-outline"></ion-icon>
+            <span
+              *ngIf="authService.loading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Logout
+          </a>
+        </li>
+        <ng-template #loggedOut>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login">
+              <ion-icon name="log-in-outline"></ion-icon>
+              <span
+                *ngIf="loading"
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Login
+            </a>
+          </li>
+        </ng-template>
+      </ul>
+    </div>
+  </div>
+</nav>
