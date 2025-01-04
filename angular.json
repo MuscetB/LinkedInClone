@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/linked-in-clone-v1",
+            "outputPath": "docs/browser",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -42,8 +42,7 @@
             ],
             "scripts": [
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "node_modules/aos/dist/aos.js",
-              "node_modules/@angular/localize/init.js"
+              "node_modules/aos/dist/aos.js"
             ],
             "allowedCommonJsDependencies": [
               "sweetalert2"
@@ -60,13 +59,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "5mb",
-                  "maximumError": "10MB"
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumWarning": "5kB",
+                  "maximumError": "10kB"
                 }
               ],
               "outputHashing": "all"
