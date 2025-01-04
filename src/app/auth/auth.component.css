@@ -16,6 +16,13 @@
   animation: fadeIn 1s ease-in-out;
 }
 
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
 /* Povećanje veličine input polja */
 .form-control {
   position: relative;

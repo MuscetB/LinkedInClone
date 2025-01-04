@@ -10,11 +10,14 @@
     <div class="col md-4">
       <div class="card shadow-sm p-4">
         <div class="card-body">
-          <img
+          <!-- <img
             src="assets/images/LI-Logo.png"
             alt="linkedin logo"
             class="linkedin-logo mb-4"
-          />
+          /> -->
+          <a class="navbar-brand d-flex justify-content-center align-items-center mb-3">
+            LinkedIn Clone
+          </a>
           <h6 class="text-center">Stay updated on your professional world</h6>
           <form [formGroup]="authForm" (ngSubmit)="onSubmit()">
             <div *ngIf="!isLoginMode">
