@@ -1,17 +1,15 @@
-
 # **LinkedIn Clone**
 
 ## **Project Description**
+
 This is a LinkedIn clone developed using modern technologies. The project allows users to create profiles, connect with other users, share posts, and communicate via chat. The application was built to learn and gain practical experience with the Angular framework and Firebase backend.
 
-_____________________________________________________________________________________________________________________
-
 ## **Demo**
+
 [**View the application here**](https://muscetb.github.io/LinkedInClone/)
 
-_____________________________________________________________________________________________________________________
-
 ## **Features**
+
 - Authentication (registration, login, Google login).
 - User profile with editing capabilities.
 - Posting and interacting with posts.
@@ -20,64 +18,56 @@ ________________________________________________________________________________
 - Real-time chat with activity and typing indicators.
 - Google Maps API integration for displaying locations.
 
-_____________________________________________________________________________________________________________________
-
 ## **Technologies**
+
 - **Frontend**: Angular, TypeScript, HTML, SCSS.
 - **Backend**: Firebase (Firestore, Authentication, Storage).
 - **Deployment**: GitHub Pages.
 
-_____________________________________________________________________________________________________________________
-
 ## **How to Set Up the Project Locally**
 
 1. Clone the repository:
-   
+
    -> git clone https://github.com/MuscetB/LinkedInClone.git
    -> cd LinkedInClone
-   
+
 2. Install dependencies:
 
-    -> npm install
-    
+   -> npm install
+
 3. Configure Firebase:
 
-    -> Open src/environments/environment.ts and add your Firebase configuration:
+   -> Open src/environments/environment.ts and add your Firebase configuration:
 
-    export const environment = {
-    production: false,
-    firebaseConfig: {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID",
-    },
-    };
-    
+   export const environment = {
+   production: false,
+   firebaseConfig: {
+   apiKey: "YOUR_API_KEY",
+   authDomain: "YOUR_AUTH_DOMAIN",
+   projectId: "YOUR_PROJECT_ID",
+   storageBucket: "YOUR_STORAGE_BUCKET",
+   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+   appId: "YOUR_APP_ID",
+   },
+   };
+
 4. Run the development server:
 
-    -> ng serve
-    
+   -> ng serve
+
 5. The application will be available at:
 
-    -> http://localhost:4200
-
-_____________________________________________________________________________________________________________________
+   -> http://localhost:4200
 
 ## Credits
+
 Development of the project:
 
 Author: Borna Mušćet
 
-_____________________________________________________________________________________________________________________
-
 ## Notes
+
 This project was created solely for educational purposes and is not used in production!!!
-
-
-_____________________________________________________________________________________________________________________
 
 # LinkedInCloneV1
 
