@@ -8,6 +8,11 @@ This is a LinkedIn clone developed using modern technologies. The project allows
 
 [**View the application here**](https://muscetb.github.io/LinkedInClone/)
 
+## **Project Report (in Croatian)**
+
+This repository contains a PDF document written in Croatian that accompanies the development of my LinkedIn Clone project.
+(https://github.com/MuscetB/documents/blob/main/Dnevnik%20stru%C4%8Dne%20prakse%20-%20Borna%20Mu%C5%A1%C4%87et.pdf)
+
 ## **Features**
 
 - Authentication (registration, login, Google login).
